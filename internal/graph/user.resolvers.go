@@ -10,7 +10,12 @@ import (
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-// User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
-	return r.UserService.GetUser(ctx)
+// UserByID is the resolver for the userById field.
+func (r *queryResolver) UserByID(ctx context.Context, id string) (*model.User, error) {
+	return r.UserService.GetUserById(ctx, id)
+}
+
+// UserList is the resolver for the userList field.
+func (r *queryResolver) UserList(ctx context.Context) ([]*model.User, error) {
+	return r.UserService.GetUserList(ctx)
 }

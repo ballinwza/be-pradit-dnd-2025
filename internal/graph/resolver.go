@@ -1,6 +1,9 @@
 package graph
 
-import user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/services"
+import (
+	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/character/service"
+	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/service"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -8,6 +11,7 @@ import user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/u
 
 type Resolver struct{
 	UserService *user_service.UserService
+	CharacterService *character_service.CharacterService
 }
 
 

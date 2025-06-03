@@ -1,7 +1,13 @@
 type Character {
+  id: String!
+  user: User!
   name: String!
+  avatarImage: String!
+  speed: Int!
+  initiativePoint: Int!
+  hitDice: Int!
 }
 
 extend type Query {
-  character: Character!
+  characterById(id: String!): Character!
 }

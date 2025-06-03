@@ -10,11 +10,9 @@ import (
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-// Character is the resolver for the character field.
-func (r *queryResolver) Character(ctx context.Context) (*model.Character, error) {
-	return &model.Character{
-		Name: "character",
-	}, nil
+// CharacterByID is the resolver for the characterById field.
+func (r *queryResolver) CharacterByID(ctx context.Context, id string) (*model.Character, error) {
+	return r.CharacterService.GetCharacterById(ctx, id)
 }
 
 // Query returns QueryResolver implementation.

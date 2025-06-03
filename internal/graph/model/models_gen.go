@@ -3,12 +3,22 @@
 package model
 
 type Character struct {
-	Name string `json:"name"`
+	ID              string `json:"id"`
+	User            *User  `json:"user"`
+	Name            string `json:"name"`
+	AvatarImage     string `json:"avatarImage"`
+	Speed           int32  `json:"speed"`
+	InitiativePoint int32  `json:"initiativePoint"`
+	HitDice         int32  `json:"hitDice"`
 }
 
 type Query struct {
 }
 
 type User struct {
-	Email string `json:"email"`
+	ID          string `json:"_id"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	DisplayName string `json:"displayName"`
+	UserImage   string `json:"userImage"`
 }
