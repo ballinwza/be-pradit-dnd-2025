@@ -1,0 +1,26 @@
+package character_service
+
+import (
+	"context"
+	"log"
+
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
+	"go.mongodb.org/mongo-driver/v2/bson"
+)
+
+
+
+func (s *CharacterService) GetCharacterById(ctx context.Context, id string) (*model.Character, error){
+	obj, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("Invalid ObjectId: %v", err)
+	}
+
+	character, err := s.characterRepository.FindOneById(context.Background(), obj)
+	if err != nil {
+		log.Printf("Error fetching user: %v", err)
+	}
+
+	
+	return MapperEntityToModel(character), nil
+}
