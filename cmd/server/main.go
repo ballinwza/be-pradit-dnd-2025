@@ -11,23 +11,35 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph"
-	"github.com/rs/cors"
 
+	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/character/service"
+	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/service"
+
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/config"
+	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
 const defaultPort = "8080"
 
 func main() {
+	config.LoadingEnv()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	userService := user_service.NewUserService()
+	characterService := character_service.NewCharacterService()
+	
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		UserService: userService,
+		CharacterService: characterService,
+	}}))
 
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"}, // frontend URL ที่อนุญาต
+		AllowedOrigins:   []string{os.Getenv("FE_URL_DOMAIN")},
         AllowCredentials: true,
         AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
         AllowedHeaders:   []string{"*"},
