@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 
+	"github.com/ballinwza/be-pradit-dnd-2025/cmd/cli"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/config"
 	"github.com/rs/cors"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -25,7 +26,7 @@ func main() {
 		port = defaultPort
 	}
 
-	srvInjecter := InjecterAllService()
+	srvInjecter := cli.InjecterAllService()
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("FE_URL_DOMAIN")},
