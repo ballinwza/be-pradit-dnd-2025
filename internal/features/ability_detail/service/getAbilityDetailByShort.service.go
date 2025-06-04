@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
+	ability_detail_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/mapper"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
-	ability_detail_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/ability_detail/mapper"
 )
 
 func (s *AbilityDetailService) GetAbilityDetailByShort(ctx context.Context, short model.AbilityShortType) (*model.AbilityDetail, error){

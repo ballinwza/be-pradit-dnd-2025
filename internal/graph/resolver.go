@@ -1,9 +1,9 @@
 package graph
 
 import (
-	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/ability_detail/service"
-	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/character/service"
-	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/service"
+	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
+	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
+	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 )
 
 // This file will not be regenerated automatically.

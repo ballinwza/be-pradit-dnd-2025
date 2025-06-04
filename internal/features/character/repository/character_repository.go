@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/database"
-	character_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/character/entity"
+	character_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/entity"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )

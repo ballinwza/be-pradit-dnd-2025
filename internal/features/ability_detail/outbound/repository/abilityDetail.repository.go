@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/database"
-	ability_detail_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/ability_detail/outbound/entity"
+	ability_detail_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/outbound/entity"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"

@@ -1,8 +1,8 @@
 package user_service
 
 import (
+	user_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/entity"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
-	user_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/entity"
 )
 
 func MapperEntityToModel(entity *user_entity.UserEntity) *model.User {

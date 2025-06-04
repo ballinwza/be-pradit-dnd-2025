@@ -1,8 +1,8 @@
 package ability_detail_mapper
 
 import (
+	ability_detail_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/outbound/entity"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
-	ability_detail_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/ability_detail/outbound/entity"
 )
 
 func MapperAbilityDetailEntityToModel(entity ability_detail_outbound_entity.AbilityDetailEntity) model.AbilityDetail{

@@ -1,6 +1,6 @@
 package user_service
 
-import user_repository "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/repository"
+import user_repository "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/repository"
 
 type UserService struct {
 	userRepository *user_repository.UserRepository
