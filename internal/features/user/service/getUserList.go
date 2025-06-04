@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	user_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/mapper"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
@@ -15,7 +16,8 @@ func (s *UserService) GetUserList(ctx context.Context) ([]*model.User, error){
 	}
 
 	for _, user := range users {
-		result = append(result, MapperEntityToModel(&user))
+		afterMapping := user_mapper.MapperUserEntityToModel(user)
+		result = append(result, &afterMapping)
 	}
 
 	return result, nil

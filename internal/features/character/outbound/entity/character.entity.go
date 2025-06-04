@@ -1,7 +1,7 @@
 package character_entity
 
 import (
-	user_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/entity"
+	user_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/outbound/entity"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 

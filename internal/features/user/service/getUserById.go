@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	user_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/mapper"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -21,6 +22,7 @@ func (s *UserService) GetUserById(ctx context.Context, id string) (*model.User, 
 		log.Fatal("Error fetching user:", err)
 	}
 
-	return MapperEntityToModel(user), nil
+	afterMapping := user_mapper.MapperUserEntityToModel(*user)
+	return &afterMapping, nil
 }
 

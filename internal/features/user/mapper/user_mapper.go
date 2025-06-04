@@ -1,13 +1,13 @@
-package user_service
+package user_mapper
 
 import (
-	user_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/entity"
+	user_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/outbound/entity"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func MapperEntityToModel(entity *user_entity.UserEntity) *model.User {
+func MapperUserEntityToModel(entity user_entity.UserEntity) model.User {
 
-	return &model.User{
+	return model.User{
 		ID: entity.Id.Hex(),
 		Email: entity.Email,
 		DisplayName: entity.DisplayName,
