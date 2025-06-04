@@ -46,6 +46,15 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AbilityDetail struct {
+		DescriptionEn func(childComplexity int) int
+		DescriptionTh func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Proficiencies func(childComplexity int) int
+		Short         func(childComplexity int) int
+	}
+
 	Character struct {
 		AvatarImage     func(childComplexity int) int
 		HitDice         func(childComplexity int) int
@@ -56,10 +65,17 @@ type ComplexityRoot struct {
 		User            func(childComplexity int) int
 	}
 
+	ProficiencyDetail struct {
+		DescriptionEn func(childComplexity int) int
+		DescriptionTh func(childComplexity int) int
+		Name          func(childComplexity int) int
+	}
+
 	Query struct {
-		CharacterByID func(childComplexity int, id string) int
-		UserByID      func(childComplexity int, id string) int
-		UserList      func(childComplexity int) int
+		AbilityDetailByShort func(childComplexity int, short model.AbilityShortType) int
+		CharacterByID        func(childComplexity int, id string) int
+		UserByID             func(childComplexity int, id string) int
+		UserList             func(childComplexity int) int
 	}
 
 	User struct {
@@ -72,6 +88,7 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
+	AbilityDetailByShort(ctx context.Context, short model.AbilityShortType) (*model.AbilityDetail, error)
 	CharacterByID(ctx context.Context, id string) (*model.Character, error)
 	UserByID(ctx context.Context, id string) (*model.User, error)
 	UserList(ctx context.Context) ([]*model.User, error)
@@ -95,6 +112,48 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AbilityDetail.description_en":
+		if e.complexity.AbilityDetail.DescriptionEn == nil {
+			break
+		}
+
+		return e.complexity.AbilityDetail.DescriptionEn(childComplexity), true
+
+	case "AbilityDetail.description_th":
+		if e.complexity.AbilityDetail.DescriptionTh == nil {
+			break
+		}
+
+		return e.complexity.AbilityDetail.DescriptionTh(childComplexity), true
+
+	case "AbilityDetail.id":
+		if e.complexity.AbilityDetail.ID == nil {
+			break
+		}
+
+		return e.complexity.AbilityDetail.ID(childComplexity), true
+
+	case "AbilityDetail.name":
+		if e.complexity.AbilityDetail.Name == nil {
+			break
+		}
+
+		return e.complexity.AbilityDetail.Name(childComplexity), true
+
+	case "AbilityDetail.proficiencies":
+		if e.complexity.AbilityDetail.Proficiencies == nil {
+			break
+		}
+
+		return e.complexity.AbilityDetail.Proficiencies(childComplexity), true
+
+	case "AbilityDetail.short":
+		if e.complexity.AbilityDetail.Short == nil {
+			break
+		}
+
+		return e.complexity.AbilityDetail.Short(childComplexity), true
 
 	case "Character.avatarImage":
 		if e.complexity.Character.AvatarImage == nil {
@@ -144,6 +203,39 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Character.User(childComplexity), true
+
+	case "ProficiencyDetail.description_en":
+		if e.complexity.ProficiencyDetail.DescriptionEn == nil {
+			break
+		}
+
+		return e.complexity.ProficiencyDetail.DescriptionEn(childComplexity), true
+
+	case "ProficiencyDetail.description_th":
+		if e.complexity.ProficiencyDetail.DescriptionTh == nil {
+			break
+		}
+
+		return e.complexity.ProficiencyDetail.DescriptionTh(childComplexity), true
+
+	case "ProficiencyDetail.name":
+		if e.complexity.ProficiencyDetail.Name == nil {
+			break
+		}
+
+		return e.complexity.ProficiencyDetail.Name(childComplexity), true
+
+	case "Query.abilityDetailByShort":
+		if e.complexity.Query.AbilityDetailByShort == nil {
+			break
+		}
+
+		args, err := ec.field_Query_abilityDetailByShort_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AbilityDetailByShort(childComplexity, args["short"].(model.AbilityShortType)), true
 
 	case "Query.characterById":
 		if e.complexity.Query.CharacterByID == nil {
@@ -299,7 +391,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/character.graphqls" "schema/user.graphqls"
+//go:embed "schema/ability_detail.graphqls" "schema/character.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -311,7 +403,9 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
+	{Name: "schema/ability_detail.graphqls", Input: sourceData("schema/ability_detail.graphqls"), BuiltIn: false},
 	{Name: "schema/character.graphqls", Input: sourceData("schema/character.graphqls"), BuiltIn: false},
+	{Name: "schema/proficiency_detail.graphqls", Input: sourceData("schema/proficiency_detail.graphqls"), BuiltIn: false},
 	{Name: "schema/user.graphqls", Input: sourceData("schema/user.graphqls"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -340,6 +434,29 @@ func (ec *executionContext) field_Query___type_argsName(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_abilityDetailByShort_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_abilityDetailByShort_argsShort(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["short"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_abilityDetailByShort_argsShort(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.AbilityShortType, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("short"))
+	if tmp, ok := rawArgs["short"]; ok {
+		return ec.unmarshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx, tmp)
+	}
+
+	var zeroVal model.AbilityShortType
 	return zeroVal, nil
 }
 
@@ -488,6 +605,278 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AbilityDetail_id(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityDetail_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityDetail_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityDetail_name(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityDetail_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityDetail_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityDetail_short(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityDetail_short(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Short, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.AbilityShortType)
+	fc.Result = res
+	return ec.marshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityDetail_short(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AbilityShortType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityDetail_description_en(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityDetail_description_en(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionEn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityDetail_description_en(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityDetail_description_th(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityDetail_description_th(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionTh, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityDetail_description_th(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityDetail_proficiencies(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityDetail_proficiencies(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Proficiencies, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProficiencyDetail)
+	fc.Result = res
+	return ec.marshalNProficiencyDetail2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐProficiencyDetailᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityDetail_proficiencies(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_ProficiencyDetail_name(ctx, field)
+			case "description_en":
+				return ec.fieldContext_ProficiencyDetail_description_en(ctx, field)
+			case "description_th":
+				return ec.fieldContext_ProficiencyDetail_description_th(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProficiencyDetail", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Character_id(ctx context.Context, field graphql.CollectedField, obj *model.Character) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Character_id(ctx, field)
@@ -805,6 +1194,207 @@ func (ec *executionContext) fieldContext_Character_hitDice(_ context.Context, fi
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProficiencyDetail_name(ctx context.Context, field graphql.CollectedField, obj *model.ProficiencyDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProficiencyDetail_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProficiencyDetail_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProficiencyDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProficiencyDetail_description_en(ctx context.Context, field graphql.CollectedField, obj *model.ProficiencyDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProficiencyDetail_description_en(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionEn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProficiencyDetail_description_en(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProficiencyDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProficiencyDetail_description_th(ctx context.Context, field graphql.CollectedField, obj *model.ProficiencyDetail) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProficiencyDetail_description_th(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionTh, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProficiencyDetail_description_th(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProficiencyDetail",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_abilityDetailByShort(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_abilityDetailByShort(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AbilityDetailByShort(rctx, fc.Args["short"].(model.AbilityShortType))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AbilityDetail)
+	fc.Result = res
+	return ec.marshalNAbilityDetail2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityDetail(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_abilityDetailByShort(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AbilityDetail_id(ctx, field)
+			case "name":
+				return ec.fieldContext_AbilityDetail_name(ctx, field)
+			case "short":
+				return ec.fieldContext_AbilityDetail_short(ctx, field)
+			case "description_en":
+				return ec.fieldContext_AbilityDetail_description_en(ctx, field)
+			case "description_th":
+				return ec.fieldContext_AbilityDetail_description_th(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_AbilityDetail_proficiencies(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AbilityDetail", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_abilityDetailByShort_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3313,6 +3903,70 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** object.gotpl ****************************
 
+var abilityDetailImplementors = []string{"AbilityDetail"}
+
+func (ec *executionContext) _AbilityDetail(ctx context.Context, sel ast.SelectionSet, obj *model.AbilityDetail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, abilityDetailImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AbilityDetail")
+		case "id":
+			out.Values[i] = ec._AbilityDetail_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._AbilityDetail_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "short":
+			out.Values[i] = ec._AbilityDetail_short(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description_en":
+			out.Values[i] = ec._AbilityDetail_description_en(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description_th":
+			out.Values[i] = ec._AbilityDetail_description_th(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "proficiencies":
+			out.Values[i] = ec._AbilityDetail_proficiencies(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var characterImplementors = []string{"Character"}
 
 func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet, obj *model.Character) graphql.Marshaler {
@@ -3382,6 +4036,55 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var proficiencyDetailImplementors = []string{"ProficiencyDetail"}
+
+func (ec *executionContext) _ProficiencyDetail(ctx context.Context, sel ast.SelectionSet, obj *model.ProficiencyDetail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, proficiencyDetailImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProficiencyDetail")
+		case "name":
+			out.Values[i] = ec._ProficiencyDetail_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description_en":
+			out.Values[i] = ec._ProficiencyDetail_description_en(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description_th":
+			out.Values[i] = ec._ProficiencyDetail_description_th(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3401,6 +4104,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "abilityDetailByShort":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_abilityDetailByShort(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "characterById":
 			field := field
 
@@ -3892,6 +4617,30 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAbilityDetail2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityDetail(ctx context.Context, sel ast.SelectionSet, v model.AbilityDetail) graphql.Marshaler {
+	return ec._AbilityDetail(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAbilityDetail2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityDetail(ctx context.Context, sel ast.SelectionSet, v *model.AbilityDetail) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AbilityDetail(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx context.Context, v any) (model.AbilityShortType, error) {
+	var res model.AbilityShortType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx context.Context, sel ast.SelectionSet, v model.AbilityShortType) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3936,6 +4685,60 @@ func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNProficiencyDetail2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐProficiencyDetailᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProficiencyDetail) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProficiencyDetail2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐProficiencyDetail(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNProficiencyDetail2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐProficiencyDetail(ctx context.Context, sel ast.SelectionSet, v *model.ProficiencyDetail) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProficiencyDetail(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {

@@ -1,6 +1,7 @@
 package graph
 
 import (
+	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/ability_detail/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/character/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/outbound/user/service"
 )
@@ -12,6 +13,7 @@ import (
 type Resolver struct{
 	UserService *user_service.UserService
 	CharacterService *character_service.CharacterService
+	AbilityDetailService *ability_detail_service.AbilityDetailService
 }
 
 

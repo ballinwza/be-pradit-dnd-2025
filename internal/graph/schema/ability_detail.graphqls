@@ -1,0 +1,21 @@
+enum AbilityShortType {
+  STR
+  DEX
+  CON
+  INT
+  WIS
+  CHA
+}
+
+type AbilityDetail {
+  id: String!
+  name: String!
+  short: AbilityShortType!
+  description_en: String!
+  description_th: String!
+  proficiencies: [ProficiencyDetail!]!
+}
+
+extend type Query {
+  abilityDetailByShort(short: AbilityShortType!): AbilityDetail!
+}

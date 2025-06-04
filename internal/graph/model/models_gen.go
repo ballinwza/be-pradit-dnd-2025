@@ -2,6 +2,22 @@
 
 package model
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type AbilityDetail struct {
+	ID            string               `json:"id"`
+	Name          string               `json:"name"`
+	Short         AbilityShortType     `json:"short"`
+	DescriptionEn string               `json:"description_en"`
+	DescriptionTh string               `json:"description_th"`
+	Proficiencies []*ProficiencyDetail `json:"proficiencies"`
+}
+
 type Character struct {
 	ID              string `json:"id"`
 	User            *User  `json:"user"`
@@ -10,6 +26,12 @@ type Character struct {
 	Speed           int32  `json:"speed"`
 	InitiativePoint int32  `json:"initiativePoint"`
 	HitDice         int32  `json:"hitDice"`
+}
+
+type ProficiencyDetail struct {
+	Name          string `json:"name"`
+	DescriptionEn string `json:"description_en"`
+	DescriptionTh string `json:"description_th"`
 }
 
 type Query struct {
@@ -21,4 +43,67 @@ type User struct {
 	Password    string `json:"password"`
 	DisplayName string `json:"displayName"`
 	UserImage   string `json:"userImage"`
+}
+
+type AbilityShortType string
+
+const (
+	AbilityShortTypeStr AbilityShortType = "STR"
+	AbilityShortTypeDex AbilityShortType = "DEX"
+	AbilityShortTypeCon AbilityShortType = "CON"
+	AbilityShortTypeInt AbilityShortType = "INT"
+	AbilityShortTypeWis AbilityShortType = "WIS"
+	AbilityShortTypeCha AbilityShortType = "CHA"
+)
+
+var AllAbilityShortType = []AbilityShortType{
+	AbilityShortTypeStr,
+	AbilityShortTypeDex,
+	AbilityShortTypeCon,
+	AbilityShortTypeInt,
+	AbilityShortTypeWis,
+	AbilityShortTypeCha,
+}
+
+func (e AbilityShortType) IsValid() bool {
+	switch e {
+	case AbilityShortTypeStr, AbilityShortTypeDex, AbilityShortTypeCon, AbilityShortTypeInt, AbilityShortTypeWis, AbilityShortTypeCha:
+		return true
+	}
+	return false
+}
+
+func (e AbilityShortType) String() string {
+	return string(e)
+}
+
+func (e *AbilityShortType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AbilityShortType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AbilityShortType", str)
+	}
+	return nil
+}
+
+func (e AbilityShortType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *AbilityShortType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e AbilityShortType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }

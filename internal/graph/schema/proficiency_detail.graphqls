@@ -1,0 +1,5 @@
+type ProficiencyDetail {
+  name: String!
+  description_en: String!
+  description_th: String!
+}

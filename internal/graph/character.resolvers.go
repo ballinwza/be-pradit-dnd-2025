@@ -14,8 +14,3 @@ import (
 func (r *queryResolver) CharacterByID(ctx context.Context, id string) (*model.Character, error) {
 	return r.CharacterService.GetCharacterById(ctx, id)
 }
-
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-
-type queryResolver struct{ *Resolver }
