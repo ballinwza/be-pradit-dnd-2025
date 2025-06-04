@@ -1,13 +1,13 @@
-package character_service
+package character_mapper
 
 import (
-	character_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/entity"
+	character_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func MapperEntityToModel(entity *character_entity.CharacterEntity) *model.Character {
-	return &model.Character{
+func MapperCharacterEntityToModel(entity character_entity.CharacterEntity) model.Character {
+	return model.Character{
 		ID: entity.Id.Hex(),
 		User: user_service.MapperEntityToModel(&entity.UserId),
 		Name: entity.Name,
