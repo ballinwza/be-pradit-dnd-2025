@@ -2,7 +2,6 @@ package user_repository
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/database"
@@ -27,11 +26,18 @@ func NewUserRepository() *UserRepository {
 func (r *UserRepository) FindAll(ctx context.Context) ([]user_entity.UserEntity, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Println("UserRepository.FindAll Error : Not founded document") 
+			return nil, mongo.ErrNoDocuments
+		} 
+
+		log.Println("UserRepository.FindAll Error : ", err)
 		return nil, err
 	}
 
 	var users []user_entity.UserEntity
 	if err := cursor.All(ctx, &users); err != nil {
+		log.Println("UserRepository.FindAll Error : ", err)
 		return nil, err
 	}
 
@@ -43,10 +49,11 @@ func (r *UserRepository) FindOneById(ctx context.Context, objId bson.ObjectID) (
 	err := r.collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			fmt.Println("Not found document")
-		} else {
-			log.Fatalf("Find error: %v", err)
-		}
+			log.Println("UserRepository.FindOneById Error : Not founded document") 
+			return nil, err
+		} 
+		
+		log.Println("UserRepository.FindOneById Error : ", err)
 		return nil, err
 	}
 

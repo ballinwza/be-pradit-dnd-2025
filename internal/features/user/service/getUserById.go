@@ -14,12 +14,14 @@ import (
 func (s *UserService) GetUserById(ctx context.Context, id string) (*model.User, error){
 	objId, err := bson.ObjectIDFromHex(id)
 	if err != nil {
-		log.Fatalf("Invalid ObjectId: %v", err)
+		log.Printf("UserService.GetUserById Error : %v\n", err)
+		return nil, err
 	}
 	
 	user, err := s.userRepository.FindOneById(context.Background(), objId)
 	if err != nil {
-		log.Fatal("Error fetching user:", err)
+		log.Println("UserService.GetUserById Error : ", err)
+		return nil, err
 	}
 
 	afterMapping := user_mapper.MapperUserEntityToModel(*user)

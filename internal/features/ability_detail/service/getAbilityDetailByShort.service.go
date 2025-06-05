@@ -12,7 +12,8 @@ func (s *AbilityDetailService) GetAbilityDetailByShort(ctx context.Context, shor
 
 	abilityDetail, err := s.abilityDetailRepository.FindOneByShort(context.Background(), ability_detail_mapper.MapperAbilityDetailShortTypeModelToEntity(short))
 	if err != nil {
-		log.Printf("Error fetching abilityDetail: %v", err)
+		log.Printf("AbilityDetailService.GetAbilityDetailByShort Error : %v\n", err)
+		return nil, err
 	}
 
 	result := ability_detail_mapper.MapperAbilityDetailEntityToModel(*abilityDetail)

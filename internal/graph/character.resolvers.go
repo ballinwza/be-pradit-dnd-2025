@@ -6,11 +6,18 @@ package graph
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/error_handler"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
 // CharacterByID is the resolver for the characterById field.
 func (r *queryResolver) CharacterByID(ctx context.Context, id string) (*model.Character, error) {
-	return r.CharacterService.GetCharacterById(ctx, id)
+	result , err := r.CharacterService.GetCharacterById(ctx, id)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get CharacterByID", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+	
+	return result, nil
 }

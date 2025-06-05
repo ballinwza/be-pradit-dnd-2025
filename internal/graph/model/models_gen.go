@@ -54,6 +54,7 @@ const (
 	AbilityShortTypeInt AbilityShortType = "INT"
 	AbilityShortTypeWis AbilityShortType = "WIS"
 	AbilityShortTypeCha AbilityShortType = "CHA"
+	AbilityShortTypeAbc AbilityShortType = "ABC"
 )
 
 var AllAbilityShortType = []AbilityShortType{
@@ -63,11 +64,12 @@ var AllAbilityShortType = []AbilityShortType{
 	AbilityShortTypeInt,
 	AbilityShortTypeWis,
 	AbilityShortTypeCha,
+	AbilityShortTypeAbc,
 }
 
 func (e AbilityShortType) IsValid() bool {
 	switch e {
-	case AbilityShortTypeStr, AbilityShortTypeDex, AbilityShortTypeCon, AbilityShortTypeInt, AbilityShortTypeWis, AbilityShortTypeCha:
+	case AbilityShortTypeStr, AbilityShortTypeDex, AbilityShortTypeCon, AbilityShortTypeInt, AbilityShortTypeWis, AbilityShortTypeCha, AbilityShortTypeAbc:
 		return true
 	}
 	return false

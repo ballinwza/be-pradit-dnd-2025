@@ -2,7 +2,6 @@ package ability_detail_outbound_repository
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/database"
@@ -25,15 +24,15 @@ func NewAbilityDetailRepository() *AbilityDetailRepository {
 }
 
 func (r *AbilityDetailRepository) FindOneByShort(ctx context.Context, short ability_detail_entity.AbilityDetailShortTypeEntity)(*ability_detail_entity.AbilityDetailEntity, error){
-	// pipeline := mongo.Pipeline{}
 	var result ability_detail_entity.AbilityDetailEntity
 	err := r.collection.FindOne(ctx, bson.M{"short": short}).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			fmt.Println("Not found document")
-		} else {
-			log.Println("Find error: ", err)
-		}
+			log.Println("AbilityDetailRepository.FindOneByShort Error : Not founded document")
+			return nil, mongo.ErrNoDocuments
+		} 
+
+		log.Printf("AbilityDetailRepository.FindOneByShort Error : %v\n", err)
 		return nil, err
 	}
 

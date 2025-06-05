@@ -14,12 +14,14 @@ import (
 func (s *CharacterService) GetCharacterById(ctx context.Context, id string) (*model.Character, error){
 	obj, err := bson.ObjectIDFromHex(id)
 	if err != nil {
-		log.Printf("Invalid ObjectId: %v", err)
+		log.Printf("CharacterService.GetCharacterById Invalid ObjectId : %v\n", err)
+		return nil, err
 	}
 
 	character, err := s.characterRepository.FindOneById(context.Background(), obj)
 	if err != nil {
-		log.Printf("Error fetching user: %v", err)
+		log.Printf("CharacterService.GetCharacterById Error : %v\n", err)
+		return nil, err
 	}
 
 	afterMapping := character_mapper.MapperCharacterEntityToModel(*character)

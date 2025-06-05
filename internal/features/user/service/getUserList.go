@@ -12,7 +12,8 @@ func (s *UserService) GetUserList(ctx context.Context) ([]*model.User, error){
 	var result []*model.User
 	users, err := s.userRepository.FindAll(context.TODO())
 	if err != nil {
-		log.Fatal("Error fetching userList:", err)
+		log.Println("UserService.GetUserList Error : ", err)
+		return nil, err
 	}
 
 	for _, user := range users {

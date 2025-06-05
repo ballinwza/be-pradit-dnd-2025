@@ -2,7 +2,6 @@ package character_repository
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/database"
@@ -44,19 +43,25 @@ func (r *CharacterRepository) FindOneById(ctx context.Context, objId bson.Object
 	
 	cursor, err := r.collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		log.Println("Error Character FindOneById : ", err)
+		if err == mongo.ErrNoDocuments {
+			log.Println("CharacterRepository.FindOneById Error : Not founded document") 
+			return nil, mongo.ErrNoDocuments
+		} 
+
+		log.Println("CharacterRepository.FindOneById Error : ", err) 
+		return nil, err
 	}
+	
 	defer cursor.Close(ctx)
 	
 	if cursor.Next(ctx) {
 		var result character_entity.CharacterEntity
 		if err := cursor.Decode(&result); err != nil {
-			log.Println("Decode error:", err)
-			return nil, fmt.Errorf("Decode error: %w", err)
+			log.Println("CharacterRepository.FindOneById decode error : ", err)
+			return nil, err
 		}
 		return &result, nil
 	}
 
-	log.Println("No character found with id: ", objId.Hex(), pipeline)
-	return nil, mongo.ErrNoDocuments
+	return nil, err
 }

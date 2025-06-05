@@ -6,16 +6,26 @@ package graph
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/error_handler"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
 // UserByID is the resolver for the userById field.
 func (r *queryResolver) UserByID(ctx context.Context, id string) (*model.User, error) {
-	return r.UserService.GetUserById(ctx, id)
+	result, err := r.UserService.GetUserById(ctx, id)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get UserByID", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+	return result, nil
 }
 
 // UserList is the resolver for the userList field.
 func (r *queryResolver) UserList(ctx context.Context) ([]*model.User, error) {
-	return r.UserService.GetUserList(ctx)
-}
+	result, err := r.UserService.GetUserList(ctx)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get UserList", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+	return result, nil
+} 

@@ -6,13 +6,20 @@ package graph
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/error_handler"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
 // AbilityDetailByShort is the resolver for the abilityDetailByShort field.
 func (r *queryResolver) AbilityDetailByShort(ctx context.Context, short model.AbilityShortType) (*model.AbilityDetail, error) {
-	return r.AbilityDetailService.GetAbilityDetailByShort(ctx, short)
+	result, err := r.AbilityDetailService.GetAbilityDetailByShort(ctx, short)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get AbilityDetailByShort", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+
+	return result, nil
 }
 
 // Query returns QueryResolver implementation.
