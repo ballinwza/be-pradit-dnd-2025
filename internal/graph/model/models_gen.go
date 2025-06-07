@@ -18,6 +18,19 @@ type AbilityDetail struct {
 	Proficiencies []*ProficiencyDetail `json:"proficiencies"`
 }
 
+type Armor struct {
+	ID                    string        `json:"id"`
+	ArmorType             ArmorType     `json:"armorType"`
+	Name                  string        `json:"name"`
+	ArmorClass            int32         `json:"armorClass"`
+	MaximumPlusArmorClass *int32        `json:"maximumPlusArmorClass,omitempty"`
+	StealthAdvantageType  AdvantageType `json:"stealthAdvantageType"`
+	Price                 *Coin         `json:"price"`
+	StrRequirement        *int32        `json:"strRequirement,omitempty"`
+	DescriptionEn         string        `json:"descriptionEn"`
+	Weight                *Weight       `json:"weight"`
+}
+
 type Character struct {
 	ID              string `json:"id"`
 	User            *User  `json:"user"`
@@ -26,6 +39,12 @@ type Character struct {
 	Speed           int32  `json:"speed"`
 	InitiativePoint int32  `json:"initiativePoint"`
 	HitDice         int32  `json:"hitDice"`
+}
+
+type Coin struct {
+	Name      string        `json:"name"`
+	ShortType CoinShortType `json:"shortType"`
+	Value     float64       `json:"value"`
 }
 
 type ProficiencyDetail struct {
@@ -45,6 +64,11 @@ type User struct {
 	UserImage   string `json:"userImage"`
 }
 
+type Weight struct {
+	Value int32  `json:"value"`
+	Unit  string `json:"unit"`
+}
+
 type AbilityShortType string
 
 const (
@@ -54,7 +78,6 @@ const (
 	AbilityShortTypeInt AbilityShortType = "INT"
 	AbilityShortTypeWis AbilityShortType = "WIS"
 	AbilityShortTypeCha AbilityShortType = "CHA"
-	AbilityShortTypeAbc AbilityShortType = "ABC"
 )
 
 var AllAbilityShortType = []AbilityShortType{
@@ -64,12 +87,11 @@ var AllAbilityShortType = []AbilityShortType{
 	AbilityShortTypeInt,
 	AbilityShortTypeWis,
 	AbilityShortTypeCha,
-	AbilityShortTypeAbc,
 }
 
 func (e AbilityShortType) IsValid() bool {
 	switch e {
-	case AbilityShortTypeStr, AbilityShortTypeDex, AbilityShortTypeCon, AbilityShortTypeInt, AbilityShortTypeWis, AbilityShortTypeCha, AbilityShortTypeAbc:
+	case AbilityShortTypeStr, AbilityShortTypeDex, AbilityShortTypeCon, AbilityShortTypeInt, AbilityShortTypeWis, AbilityShortTypeCha:
 		return true
 	}
 	return false
@@ -105,6 +127,181 @@ func (e *AbilityShortType) UnmarshalJSON(b []byte) error {
 }
 
 func (e AbilityShortType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type AdvantageType string
+
+const (
+	AdvantageTypeDisadvantage AdvantageType = "DISADVANTAGE"
+	AdvantageTypeNone         AdvantageType = "NONE"
+	AdvantageTypeAdvantage    AdvantageType = "ADVANTAGE"
+)
+
+var AllAdvantageType = []AdvantageType{
+	AdvantageTypeDisadvantage,
+	AdvantageTypeNone,
+	AdvantageTypeAdvantage,
+}
+
+func (e AdvantageType) IsValid() bool {
+	switch e {
+	case AdvantageTypeDisadvantage, AdvantageTypeNone, AdvantageTypeAdvantage:
+		return true
+	}
+	return false
+}
+
+func (e AdvantageType) String() string {
+	return string(e)
+}
+
+func (e *AdvantageType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AdvantageType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AdvantageType", str)
+	}
+	return nil
+}
+
+func (e AdvantageType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *AdvantageType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e AdvantageType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type ArmorType string
+
+const (
+	ArmorTypeLight  ArmorType = "LIGHT"
+	ArmorTypeMedium ArmorType = "MEDIUM"
+	ArmorTypeHeavy  ArmorType = "HEAVY"
+)
+
+var AllArmorType = []ArmorType{
+	ArmorTypeLight,
+	ArmorTypeMedium,
+	ArmorTypeHeavy,
+}
+
+func (e ArmorType) IsValid() bool {
+	switch e {
+	case ArmorTypeLight, ArmorTypeMedium, ArmorTypeHeavy:
+		return true
+	}
+	return false
+}
+
+func (e ArmorType) String() string {
+	return string(e)
+}
+
+func (e *ArmorType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ArmorType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ArmorType", str)
+	}
+	return nil
+}
+
+func (e ArmorType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *ArmorType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e ArmorType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type CoinShortType string
+
+const (
+	CoinShortTypeCp CoinShortType = "CP"
+	CoinShortTypeSp CoinShortType = "SP"
+	CoinShortTypeEp CoinShortType = "EP"
+	CoinShortTypeGp CoinShortType = "GP"
+	CoinShortTypePp CoinShortType = "PP"
+)
+
+var AllCoinShortType = []CoinShortType{
+	CoinShortTypeCp,
+	CoinShortTypeSp,
+	CoinShortTypeEp,
+	CoinShortTypeGp,
+	CoinShortTypePp,
+}
+
+func (e CoinShortType) IsValid() bool {
+	switch e {
+	case CoinShortTypeCp, CoinShortTypeSp, CoinShortTypeEp, CoinShortTypeGp, CoinShortTypePp:
+		return true
+	}
+	return false
+}
+
+func (e CoinShortType) String() string {
+	return string(e)
+}
+
+func (e *CoinShortType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = CoinShortType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid CoinShortType", str)
+	}
+	return nil
+}
+
+func (e CoinShortType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *CoinShortType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e CoinShortType) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil

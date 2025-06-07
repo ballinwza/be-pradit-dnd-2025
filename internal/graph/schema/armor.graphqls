@@ -1,0 +1,22 @@
+enum ArmorType {
+  LIGHT
+  MEDIUM
+  HEAVY
+}
+
+type Armor {
+  id: String!
+  armorType: ArmorType!
+  name: String!
+  armorClass: Int!
+  maximumPlusArmorClass: Int
+  stealthAdvantageType: AdvantageType!
+  price: Coin!
+  strRequirement: Int
+  descriptionEn: String!
+  weight: Weight!
+}
+
+extend type Query {
+  armorById(id: String!): Armor!
+}

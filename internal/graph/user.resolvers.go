@@ -28,4 +28,4 @@ func (r *queryResolver) UserList(ctx context.Context) ([]*model.User, error) {
 		return nil, error_handler.NewValidationError("Failed to get UserList", err, http.StatusInternalServerError).GqlError(ctx)
 	}
 	return result, nil
-} 
+}

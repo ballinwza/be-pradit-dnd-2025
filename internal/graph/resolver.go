@@ -2,6 +2,7 @@ package graph
 
 import (
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
+	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 )
@@ -14,6 +15,7 @@ type Resolver struct{
 	UserService *user_service.UserService
 	CharacterService *character_service.CharacterService
 	AbilityDetailService *ability_detail_service.AbilityDetailService
+	ArmorService *armor_service.ArmorService
 }
 
 

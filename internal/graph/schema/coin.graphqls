@@ -1,0 +1,13 @@
+enum CoinShortType {
+  CP
+  SP
+  EP
+  GP
+  PP
+}
+
+type Coin {
+  name: String!
+  shortType: CoinShortType!
+  value: Float!
+}

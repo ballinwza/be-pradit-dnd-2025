@@ -15,6 +15,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
+	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph"
@@ -24,11 +25,13 @@ func InjecterAllService() *handler.Server{
 	userService := user_service.NewUserService()
 	characterService := character_service.NewCharacterService()
 	abilityDetailService := ability_detail_service.NewAbilityDetailService()
+	aromorService := armor_service.NewArmorService()
 	
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		UserService: userService,
 		CharacterService: characterService,
 		AbilityDetailService: abilityDetailService,
+		ArmorService: aromorService,
 	}}))
 
 	srv.AddTransport(transport.Options{})

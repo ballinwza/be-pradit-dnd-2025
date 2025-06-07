@@ -6,3 +6,9 @@ codegen:
 
 run-dev:
 	go run cmd/server/main.go
+
+format:
+	goimports -w .
+
+install-goimports:
+	go install golang.org/x/tools/cmd/goimports@latest

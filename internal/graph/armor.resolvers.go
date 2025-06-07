@@ -12,11 +12,11 @@ import (
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-// CharacterByID is the resolver for the characterById field.
-func (r *queryResolver) CharacterByID(ctx context.Context, id string) (*model.Character, error) {
-	result, err := r.CharacterService.GetCharacterById(ctx, id)
+// ArmorByID is the resolver for the armorById field.
+func (r *queryResolver) ArmorByID(ctx context.Context, id string) (*model.Armor, error) {
+	result, err := r.ArmorService.GetArmorById(ctx, id)
 	if err != nil {
-		return nil, error_handler.NewValidationError("Failed to get CharacterByID", err, http.StatusInternalServerError).GqlError(ctx)
+		return nil, error_handler.NewValidationError("Failed to get ArmorById", err, http.StatusInternalServerError).GqlError(ctx)
 	}
 
 	return result, nil
