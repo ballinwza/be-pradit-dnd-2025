@@ -12,3 +12,6 @@ format:
 
 install-goimports:
 	go install golang.org/x/tools/cmd/goimports@latest
+
+build:
+	go build -o be-pradit-dnd-2025 ./cmd/server 

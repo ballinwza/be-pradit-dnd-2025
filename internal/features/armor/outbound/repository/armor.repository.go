@@ -22,18 +22,39 @@ func NewArmorRepository() *ArmorRepository {
 	}
 }
 
-func (r *ArmorRepository) FindOneById(ctx context.Context, objId bson.ObjectID) (*armor_outbound_entity.ArmorEntity, error){
+func (r *ArmorRepository) FindOneById(ctx context.Context, objId bson.ObjectID) (*armor_outbound_entity.ArmorEntity, error) {
 	var result armor_outbound_entity.ArmorEntity
-	err := r.collection.FindOne(ctx, bson.M{"_id":objId}).Decode(&result)
+	err := r.collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Println("ArmorRepository.FindOneById Error : Not founded document")
 			return nil, mongo.ErrNoDocuments
-		} 
+		}
 
 		log.Printf("ArmorRepository.FindOneById Error : %v\n", err)
 		return nil, err
 	}
 
 	return &result, nil
+}
+
+func (r *ArmorRepository) FindAll(ctx context.Context) ([]*armor_outbound_entity.ArmorEntity, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{})
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Println("ArmorRepository.FindAll Error : Not founded document")
+			return nil, mongo.ErrNoDocuments
+		}
+
+		log.Println("ArmorRepository.FindAll Error : ", err)
+		return nil, err
+	}
+
+	var result []*armor_outbound_entity.ArmorEntity
+	if err := cursor.All(ctx, &result); err != nil {
+		log.Println("ArmorRepository.FindAll Error : ", err)
+		return nil, err
+	}
+
+	return result, nil
 }

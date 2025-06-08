@@ -21,3 +21,13 @@ func (r *queryResolver) ArmorByID(ctx context.Context, id string) (*model.Armor,
 
 	return result, nil
 }
+
+// ArmorList is the resolver for the armorList field.
+func (r *queryResolver) ArmorList(ctx context.Context) ([]*model.Armor, error) {
+	result, err := r.ArmorService.GetArmorList(ctx)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get ArmorList", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+
+	return result, nil
+}

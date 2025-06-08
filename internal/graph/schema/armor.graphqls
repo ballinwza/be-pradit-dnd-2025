@@ -19,4 +19,5 @@ type Armor {
 
 extend type Query {
   armorById(id: String!): Armor!
+  armorList: [Armor!]!
 }
