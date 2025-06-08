@@ -31,3 +31,13 @@ func (r *queryResolver) ArmorList(ctx context.Context) ([]*model.Armor, error) {
 
 	return result, nil
 }
+
+// ShieldList is the resolver for the shieldList field.
+func (r *queryResolver) ShieldList(ctx context.Context) ([]*model.Armor, error) {
+	result, err := r.ArmorService.GetShieldList(ctx)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get ShieldList", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+
+	return result, nil
+}

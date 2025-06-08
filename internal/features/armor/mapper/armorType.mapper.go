@@ -13,6 +13,8 @@ func MapperArmorTypeEntityToModel(entity armor_outbound_entity.ArmorTypeEntity) 
 		return model.ArmorTypeMedium
 	case armor_outbound_entity.ArmorTypeEntityHeavy:
 		return model.ArmorTypeHeavy
+	case armor_outbound_entity.ArmorTypeEntityShield:
+		return model.ArmorTypeShield
 	default:
 		return "unknow ArmorType"
 	}

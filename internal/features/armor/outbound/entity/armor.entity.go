@@ -6,11 +6,18 @@ import (
 )
 
 type ArmorTypeEntity string
+type ArmorEquipmentTypeArmorEntity string
 
 const (
 	ArmorTypeEntityLight  ArmorTypeEntity = "light"
 	ArmorTypeEntityMedium ArmorTypeEntity = "medium"
 	ArmorTypeEntityHeavy  ArmorTypeEntity = "heavy"
+	ArmorTypeEntityShield ArmorTypeEntity = "shield"
+)
+
+const (
+	ArmorEquipmentTypeArmor  ArmorEquipmentTypeArmorEntity = "armor"
+	ArmorEquipmentTypeShield ArmorEquipmentTypeArmorEntity = "shield"
 )
 
 type ArmorEntity struct {
@@ -24,4 +31,5 @@ type ArmorEntity struct {
 	StrRequirement        *int32                                   `bson:"str_requirement,omitempty" json:"str_requirement"`
 	DescriptionEn         string                                   `bson:"description_en" json:"description_en"`
 	Weight                core_outbound_entity.WeightEntity        `bson:"weight" json:"weight"`
+	ArmorEquipmentType    ArmorEquipmentTypeArmorEntity            `bson:"armor_equipment_type" json:"armor_equipment_type"`
 }

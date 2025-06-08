@@ -2,6 +2,7 @@ enum ArmorType {
   LIGHT
   MEDIUM
   HEAVY
+  SHIELD
 }
 
 type Armor {
@@ -20,4 +21,5 @@ type Armor {
 extend type Query {
   armorById(id: String!): Armor!
   armorList: [Armor!]!
+  shieldList: [Armor!]!
 }

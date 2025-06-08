@@ -9,15 +9,15 @@ import (
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func (s *ArmorService) GetArmorList(ctx context.Context) ([]*model.Armor, error) {
-	armorList, err := s.armorRepository.FindAll(ctx, armor_outbound_entity.ArmorEquipmentTypeArmor)
+func (s *ArmorService) GetShieldList(ctx context.Context) ([]*model.Armor, error) {
+	shieldList, err := s.armorRepository.FindAll(ctx, armor_outbound_entity.ArmorEquipmentTypeShield)
 	if err != nil {
-		log.Println("ArmorService.GetArmorList Error : ", err)
+		log.Println("ArmorService.GetShieldList Error : ", err)
 		return nil, err
 	}
 
-	result := make([]*model.Armor, len(armorList))
-	for i, armor := range armorList {
+	result := make([]*model.Armor, len(shieldList))
+	for i, armor := range shieldList {
 		afterMapping := armor_mapper.MapperArmorEntityToModel(*armor)
 		result[i] = &afterMapping
 	}

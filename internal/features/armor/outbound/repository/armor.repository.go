@@ -38,8 +38,8 @@ func (r *ArmorRepository) FindOneById(ctx context.Context, objId bson.ObjectID) 
 	return &result, nil
 }
 
-func (r *ArmorRepository) FindAll(ctx context.Context) ([]*armor_outbound_entity.ArmorEntity, error) {
-	cursor, err := r.collection.Find(ctx, bson.M{})
+func (r *ArmorRepository) FindAll(ctx context.Context, equipmentType armor_outbound_entity.ArmorEquipmentTypeArmorEntity) ([]*armor_outbound_entity.ArmorEntity, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{"armor_equipment_type": equipmentType})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Println("ArmorRepository.FindAll Error : Not founded document")

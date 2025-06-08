@@ -95,6 +95,7 @@ type ComplexityRoot struct {
 		ArmorByID            func(childComplexity int, id string) int
 		ArmorList            func(childComplexity int) int
 		CharacterByID        func(childComplexity int, id string) int
+		ShieldList           func(childComplexity int) int
 		UserByID             func(childComplexity int, id string) int
 		UserList             func(childComplexity int) int
 	}
@@ -117,6 +118,7 @@ type QueryResolver interface {
 	AbilityDetailByShort(ctx context.Context, short model.AbilityShortType) (*model.AbilityDetail, error)
 	ArmorByID(ctx context.Context, id string) (*model.Armor, error)
 	ArmorList(ctx context.Context) ([]*model.Armor, error)
+	ShieldList(ctx context.Context) ([]*model.Armor, error)
 	CharacterByID(ctx context.Context, id string) (*model.Character, error)
 	UserByID(ctx context.Context, id string) (*model.User, error)
 	UserList(ctx context.Context) ([]*model.User, error)
@@ -386,6 +388,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.CharacterByID(childComplexity, args["id"].(string)), true
+
+	case "Query.shieldList":
+		if e.complexity.Query.ShieldList == nil {
+			break
+		}
+
+		return e.complexity.Query.ShieldList(childComplexity), true
 
 	case "Query.userById":
 		if e.complexity.Query.UserByID == nil {
@@ -2267,6 +2276,72 @@ func (ec *executionContext) _Query_armorList(ctx context.Context, field graphql.
 }
 
 func (ec *executionContext) fieldContext_Query_armorList(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Armor_id(ctx, field)
+			case "armorType":
+				return ec.fieldContext_Armor_armorType(ctx, field)
+			case "name":
+				return ec.fieldContext_Armor_name(ctx, field)
+			case "armorClass":
+				return ec.fieldContext_Armor_armorClass(ctx, field)
+			case "maximumPlusArmorClass":
+				return ec.fieldContext_Armor_maximumPlusArmorClass(ctx, field)
+			case "stealthAdvantageType":
+				return ec.fieldContext_Armor_stealthAdvantageType(ctx, field)
+			case "price":
+				return ec.fieldContext_Armor_price(ctx, field)
+			case "strRequirement":
+				return ec.fieldContext_Armor_strRequirement(ctx, field)
+			case "descriptionEn":
+				return ec.fieldContext_Armor_descriptionEn(ctx, field)
+			case "weight":
+				return ec.fieldContext_Armor_weight(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_shieldList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_shieldList(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ShieldList(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Armor)
+	fc.Result = res
+	return ec.marshalNArmor2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐArmorᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_shieldList(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -5275,6 +5350,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_armorList(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "shieldList":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_shieldList(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

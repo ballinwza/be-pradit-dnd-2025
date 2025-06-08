@@ -195,17 +195,19 @@ const (
 	ArmorTypeLight  ArmorType = "LIGHT"
 	ArmorTypeMedium ArmorType = "MEDIUM"
 	ArmorTypeHeavy  ArmorType = "HEAVY"
+	ArmorTypeShield ArmorType = "SHIELD"
 )
 
 var AllArmorType = []ArmorType{
 	ArmorTypeLight,
 	ArmorTypeMedium,
 	ArmorTypeHeavy,
+	ArmorTypeShield,
 }
 
 func (e ArmorType) IsValid() bool {
 	switch e {
-	case ArmorTypeLight, ArmorTypeMedium, ArmorTypeHeavy:
+	case ArmorTypeLight, ArmorTypeMedium, ArmorTypeHeavy, ArmorTypeShield:
 		return true
 	}
 	return false
