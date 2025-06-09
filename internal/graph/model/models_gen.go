@@ -29,6 +29,7 @@ type Armor struct {
 	StrRequirement        *int32        `json:"strRequirement,omitempty"`
 	DescriptionEn         string        `json:"descriptionEn"`
 	Weight                *Weight       `json:"weight"`
+	ImageURL              string        `json:"imageUrl"`
 }
 
 type Character struct {

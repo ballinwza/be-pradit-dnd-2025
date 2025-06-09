@@ -16,6 +16,7 @@ type Armor {
   strRequirement: Int
   descriptionEn: String!
   weight: Weight!
+  imageUrl: String!
 }
 
 extend type Query {

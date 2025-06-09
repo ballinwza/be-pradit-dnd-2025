@@ -60,6 +60,7 @@ type ComplexityRoot struct {
 		ArmorType             func(childComplexity int) int
 		DescriptionEn         func(childComplexity int) int
 		ID                    func(childComplexity int) int
+		ImageURL              func(childComplexity int) int
 		MaximumPlusArmorClass func(childComplexity int) int
 		Name                  func(childComplexity int) int
 		Price                 func(childComplexity int) int
@@ -212,6 +213,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Armor.ID(childComplexity), true
+
+	case "Armor.imageUrl":
+		if e.complexity.Armor.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.Armor.ImageURL(childComplexity), true
 
 	case "Armor.maximumPlusArmorClass":
 		if e.complexity.Armor.MaximumPlusArmorClass == nil {
@@ -1514,6 +1522,50 @@ func (ec *executionContext) fieldContext_Armor_weight(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Armor_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.Armor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Armor_imageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Armor_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Armor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Character_id(ctx context.Context, field graphql.CollectedField, obj *model.Character) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Character_id(ctx, field)
 	if err != nil {
@@ -2226,6 +2278,8 @@ func (ec *executionContext) fieldContext_Query_armorById(ctx context.Context, fi
 				return ec.fieldContext_Armor_descriptionEn(ctx, field)
 			case "weight":
 				return ec.fieldContext_Armor_weight(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Armor_imageUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
 		},
@@ -2303,6 +2357,8 @@ func (ec *executionContext) fieldContext_Query_armorList(_ context.Context, fiel
 				return ec.fieldContext_Armor_descriptionEn(ctx, field)
 			case "weight":
 				return ec.fieldContext_Armor_weight(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Armor_imageUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
 		},
@@ -2369,6 +2425,8 @@ func (ec *executionContext) fieldContext_Query_shieldList(_ context.Context, fie
 				return ec.fieldContext_Armor_descriptionEn(ctx, field)
 			case "weight":
 				return ec.fieldContext_Armor_weight(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Armor_imageUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
 		},
@@ -5084,6 +5142,11 @@ func (ec *executionContext) _Armor(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "weight":
 			out.Values[i] = ec._Armor_weight(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "imageUrl":
+			out.Values[i] = ec._Armor_imageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

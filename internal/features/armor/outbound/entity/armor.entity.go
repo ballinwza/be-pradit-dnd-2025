@@ -32,4 +32,5 @@ type ArmorEntity struct {
 	DescriptionEn         string                                   `bson:"description_en" json:"description_en"`
 	Weight                core_outbound_entity.WeightEntity        `bson:"weight" json:"weight"`
 	ArmorEquipmentType    ArmorEquipmentTypeArmorEntity            `bson:"armor_equipment_type" json:"armor_equipment_type"`
+	ImageUrl              *string                                  `bson:"image_url,omitempty" json:"image_url"`
 }

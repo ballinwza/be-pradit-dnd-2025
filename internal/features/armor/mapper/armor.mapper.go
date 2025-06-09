@@ -26,5 +26,6 @@ func MapperArmorEntityToModel(entity armor_outbound_entity.ArmorEntity) model.Ar
 		StrRequirement:        entity.StrRequirement,
 		DescriptionEn:         entity.DescriptionEn,
 		Weight:                &afterMapWeight,
+		ImageURL:              *entity.ImageUrl,
 	}
 }
