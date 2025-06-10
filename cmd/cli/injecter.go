@@ -18,20 +18,23 @@ import (
 	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
+	weapon_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/weapon/service"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph"
 )
 
-func InjecterAllService() *handler.Server{
+func InjecterAllService() *handler.Server {
 	userService := user_service.NewUserService()
 	characterService := character_service.NewCharacterService()
 	abilityDetailService := ability_detail_service.NewAbilityDetailService()
-	aromorService := armor_service.NewArmorService()
-	
+	armorService := armor_service.NewArmorService()
+	weaponService := weapon_service.NewWeaponService()
+
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		UserService: userService,
-		CharacterService: characterService,
+		UserService:          userService,
+		CharacterService:     characterService,
 		AbilityDetailService: abilityDetailService,
-		ArmorService: aromorService,
+		ArmorService:         armorService,
+		WeaponService:        weaponService,
 	}}))
 
 	srv.AddTransport(transport.Options{})
@@ -45,7 +48,7 @@ func InjecterAllService() *handler.Server{
 		Cache: lru.New[string](100),
 	})
 
-	srv.SetErrorPresenter(func (ctx context.Context, err error) *gqlerror.Error  {
+	srv.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
 		gqlErr := graphql.DefaultErrorPresenter(ctx, err)
 		if gqlErr.Extensions == nil {
 			gqlErr.Extensions = map[string]interface{}{}

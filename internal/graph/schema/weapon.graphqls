@@ -1,0 +1,34 @@
+type Weapon {
+  id: String!
+  name: String!
+  diceQuantity: Int!
+  descriptionEn: String!
+  descriptionTh: String!
+  diceRollType: DiceRollType!
+  damagedType: DamagedType!
+  weight: Weight!
+  price: Coin!
+  weaponMastery: WeaponMastery!
+  weaponProperty: [WeaponProperty!]!
+  imageUrl: String!
+}
+
+type WeaponMastery {
+  id: String!
+  name: String!
+  descriptionEn: String!
+  descriptionTh: String!
+  imageUrl: String!
+}
+
+type WeaponProperty {
+  id: String!
+  name: String!
+  descriptionEn: String!
+  descriptionTh: String!
+  imageUrl: String!
+}
+
+extend type Query {
+  weaponList: [Weapon!]!
+}

@@ -65,6 +65,37 @@ type User struct {
 	UserImage   string `json:"userImage"`
 }
 
+type Weapon struct {
+	ID             string            `json:"id"`
+	Name           string            `json:"name"`
+	DiceQuantity   int32             `json:"diceQuantity"`
+	DescriptionEn  string            `json:"descriptionEn"`
+	DescriptionTh  string            `json:"descriptionTh"`
+	DiceRollType   DiceRollType      `json:"diceRollType"`
+	DamagedType    DamagedType       `json:"damagedType"`
+	Weight         *Weight           `json:"weight"`
+	Price          *Coin             `json:"price"`
+	WeaponMastery  *WeaponMastery    `json:"weaponMastery"`
+	WeaponProperty []*WeaponProperty `json:"weaponProperty"`
+	ImageURL       string            `json:"imageUrl"`
+}
+
+type WeaponMastery struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	DescriptionEn string `json:"descriptionEn"`
+	DescriptionTh string `json:"descriptionTh"`
+	ImageURL      string `json:"imageUrl"`
+}
+
+type WeaponProperty struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	DescriptionEn string `json:"descriptionEn"`
+	DescriptionTh string `json:"descriptionTh"`
+	ImageURL      string `json:"imageUrl"`
+}
+
 type Weight struct {
 	Value int32  `json:"value"`
 	Unit  string `json:"unit"`
@@ -305,6 +336,126 @@ func (e *CoinShortType) UnmarshalJSON(b []byte) error {
 }
 
 func (e CoinShortType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type DamagedType string
+
+const (
+	DamagedTypeBludgeon DamagedType = "BLUDGEON"
+	DamagedTypePierce   DamagedType = "PIERCE"
+	DamagedTypeSLASh    DamagedType = "SLASH"
+)
+
+var AllDamagedType = []DamagedType{
+	DamagedTypeBludgeon,
+	DamagedTypePierce,
+	DamagedTypeSLASh,
+}
+
+func (e DamagedType) IsValid() bool {
+	switch e {
+	case DamagedTypeBludgeon, DamagedTypePierce, DamagedTypeSLASh:
+		return true
+	}
+	return false
+}
+
+func (e DamagedType) String() string {
+	return string(e)
+}
+
+func (e *DamagedType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DamagedType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DamagedType", str)
+	}
+	return nil
+}
+
+func (e DamagedType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *DamagedType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e DamagedType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type DiceRollType string
+
+const (
+	DiceRollTypeD20 DiceRollType = "D20"
+	DiceRollTypeD12 DiceRollType = "D12"
+	DiceRollTypeD10 DiceRollType = "D10"
+	DiceRollTypeD8  DiceRollType = "D8"
+	DiceRollTypeD6  DiceRollType = "D6"
+	DiceRollTypeD4  DiceRollType = "D4"
+)
+
+var AllDiceRollType = []DiceRollType{
+	DiceRollTypeD20,
+	DiceRollTypeD12,
+	DiceRollTypeD10,
+	DiceRollTypeD8,
+	DiceRollTypeD6,
+	DiceRollTypeD4,
+}
+
+func (e DiceRollType) IsValid() bool {
+	switch e {
+	case DiceRollTypeD20, DiceRollTypeD12, DiceRollTypeD10, DiceRollTypeD8, DiceRollTypeD6, DiceRollTypeD4:
+		return true
+	}
+	return false
+}
+
+func (e DiceRollType) String() string {
+	return string(e)
+}
+
+func (e *DiceRollType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DiceRollType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DiceRollType", str)
+	}
+	return nil
+}
+
+func (e DiceRollType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *DiceRollType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e DiceRollType) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
