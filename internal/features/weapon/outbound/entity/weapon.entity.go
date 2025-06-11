@@ -18,4 +18,6 @@ type WeaponEntity struct {
 	MasteryId     WeaponMasteryEntity                     `bson:"mastery_id" json:"mastery_id"`
 	PropertyId    []WeaponPropertyEntity                  `bson:"property_id" json:"property_id"`
 	ImageUrl      string                                  `bson:"image_url" json:"image_url"`
+	NormalRange   int32                                   `bson:"normal_range" json:"normal_range"`
+	LongRange     int32                                   `bson:"long_range" json:"long_range"`
 }

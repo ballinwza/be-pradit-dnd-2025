@@ -118,7 +118,9 @@ type ComplexityRoot struct {
 		DiceRollType   func(childComplexity int) int
 		ID             func(childComplexity int) int
 		ImageURL       func(childComplexity int) int
+		LongRange      func(childComplexity int) int
 		Name           func(childComplexity int) int
+		NormalRange    func(childComplexity int) int
 		Price          func(childComplexity int) int
 		WeaponMastery  func(childComplexity int) int
 		WeaponProperty func(childComplexity int) int
@@ -547,12 +549,26 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Weapon.ImageURL(childComplexity), true
 
+	case "Weapon.longRange":
+		if e.complexity.Weapon.LongRange == nil {
+			break
+		}
+
+		return e.complexity.Weapon.LongRange(childComplexity), true
+
 	case "Weapon.name":
 		if e.complexity.Weapon.Name == nil {
 			break
 		}
 
 		return e.complexity.Weapon.Name(childComplexity), true
+
+	case "Weapon.normalRange":
+		if e.complexity.Weapon.NormalRange == nil {
+			break
+		}
+
+		return e.complexity.Weapon.NormalRange(childComplexity), true
 
 	case "Weapon.price":
 		if e.complexity.Weapon.Price == nil {
@@ -2888,6 +2904,10 @@ func (ec *executionContext) fieldContext_Query_weaponList(_ context.Context, fie
 				return ec.fieldContext_Weapon_weaponProperty(ctx, field)
 			case "imageUrl":
 				return ec.fieldContext_Weapon_imageUrl(ctx, field)
+			case "normalRange":
+				return ec.fieldContext_Weapon_normalRange(ctx, field)
+			case "longRange":
+				return ec.fieldContext_Weapon_longRange(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Weapon", field.Name)
 		},
@@ -3807,6 +3827,88 @@ func (ec *executionContext) fieldContext_Weapon_imageUrl(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Weapon_normalRange(ctx context.Context, field graphql.CollectedField, obj *model.Weapon) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Weapon_normalRange(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NormalRange, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int32)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Weapon_normalRange(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Weapon",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Weapon_longRange(ctx context.Context, field graphql.CollectedField, obj *model.Weapon) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Weapon_longRange(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LongRange, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int32)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Weapon_longRange(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Weapon",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6969,6 +7071,10 @@ func (ec *executionContext) _Weapon(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "normalRange":
+			out.Values[i] = ec._Weapon_normalRange(ctx, field, obj)
+		case "longRange":
+			out.Values[i] = ec._Weapon_longRange(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

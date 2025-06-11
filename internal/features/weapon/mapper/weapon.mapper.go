@@ -42,5 +42,7 @@ func MapperWeaponEntityToModel(entity weapon_outbound_entity.WeaponEntity) model
 		WeaponMastery:  &afterMappingMastery,
 		WeaponProperty: propertyListAfterMapping,
 		ImageURL:       entity.ImageUrl,
+		NormalRange:    &entity.NormalRange,
+		LongRange:      &entity.LongRange,
 	}
 }

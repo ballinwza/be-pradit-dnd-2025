@@ -78,6 +78,8 @@ type Weapon struct {
 	WeaponMastery  *WeaponMastery    `json:"weaponMastery"`
 	WeaponProperty []*WeaponProperty `json:"weaponProperty"`
 	ImageURL       string            `json:"imageUrl"`
+	NormalRange    *int32            `json:"normalRange,omitempty"`
+	LongRange      *int32            `json:"longRange,omitempty"`
 }
 
 type WeaponMastery struct {

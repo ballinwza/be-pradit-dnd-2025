@@ -11,6 +11,8 @@ type Weapon {
   weaponMastery: WeaponMastery!
   weaponProperty: [WeaponProperty!]!
   imageUrl: String!
+  normalRange: Int
+  longRange: Int
 }
 
 type WeaponMastery {
