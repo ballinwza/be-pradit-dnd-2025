@@ -1,0 +1,11 @@
+type Equipment {
+  id: String!
+  characterId: String!
+  armor: Armor!
+  rightHanded: Weapon!
+  leftHanded: Weapon!
+}
+
+extend type Query {
+  equipmentByCharacterId(characterId: String!): Equipment!
+}

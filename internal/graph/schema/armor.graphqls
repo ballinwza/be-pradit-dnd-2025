@@ -19,6 +19,20 @@ type Armor {
   imageUrl: String!
 }
 
+type Shield {
+  id: String!
+  armorType: ArmorType!
+  name: String!
+  armorClass: Int!
+  maximumPlusArmorClass: Int
+  stealthAdvantageType: AdvantageType!
+  price: Coin!
+  strRequirement: Int
+  descriptionEn: String!
+  weight: Weight!
+  imageUrl: String!
+}
+
 extend type Query {
   armorById(id: String!): Armor!
   armorList: [Armor!]!

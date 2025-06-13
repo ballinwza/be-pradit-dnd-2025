@@ -17,6 +17,7 @@ import (
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
 	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
+	equipment_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	weapon_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/weapon/service"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph"
@@ -28,6 +29,7 @@ func InjecterAllService() *handler.Server {
 	abilityDetailService := ability_detail_service.NewAbilityDetailService()
 	armorService := armor_service.NewArmorService()
 	weaponService := weapon_service.NewWeaponService()
+	equipmentService := equipment_service.NewEquipmentService()
 
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		UserService:          userService,
@@ -35,6 +37,7 @@ func InjecterAllService() *handler.Server {
 		AbilityDetailService: abilityDetailService,
 		ArmorService:         armorService,
 		WeaponService:        weaponService,
+		EquipmentService:     equipmentService,
 	}}))
 
 	srv.AddTransport(transport.Options{})

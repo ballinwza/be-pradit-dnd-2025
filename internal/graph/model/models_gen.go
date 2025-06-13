@@ -48,6 +48,14 @@ type Coin struct {
 	Value     float64       `json:"value"`
 }
 
+type Equipment struct {
+	ID          string  `json:"id"`
+	CharacterID string  `json:"characterId"`
+	Armor       *Armor  `json:"armor"`
+	RightHanded *Weapon `json:"rightHanded"`
+	LeftHanded  *Weapon `json:"leftHanded"`
+}
+
 type ProficiencyDetail struct {
 	Name          string `json:"name"`
 	DescriptionEn string `json:"description_en"`
@@ -55,6 +63,20 @@ type ProficiencyDetail struct {
 }
 
 type Query struct {
+}
+
+type Shield struct {
+	ID                    string        `json:"id"`
+	ArmorType             ArmorType     `json:"armorType"`
+	Name                  string        `json:"name"`
+	ArmorClass            int32         `json:"armorClass"`
+	MaximumPlusArmorClass *int32        `json:"maximumPlusArmorClass,omitempty"`
+	StealthAdvantageType  AdvantageType `json:"stealthAdvantageType"`
+	Price                 *Coin         `json:"price"`
+	StrRequirement        *int32        `json:"strRequirement,omitempty"`
+	DescriptionEn         string        `json:"descriptionEn"`
+	Weight                *Weight       `json:"weight"`
+	ImageURL              string        `json:"imageUrl"`
 }
 
 type User struct {

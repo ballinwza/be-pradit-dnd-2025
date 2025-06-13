@@ -85,6 +85,14 @@ type ComplexityRoot struct {
 		Value     func(childComplexity int) int
 	}
 
+	Equipment struct {
+		Armor       func(childComplexity int) int
+		CharacterID func(childComplexity int) int
+		ID          func(childComplexity int) int
+		LeftHanded  func(childComplexity int) int
+		RightHanded func(childComplexity int) int
+	}
+
 	ProficiencyDetail struct {
 		DescriptionEn func(childComplexity int) int
 		DescriptionTh func(childComplexity int) int
@@ -92,14 +100,29 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		AbilityDetailByShort func(childComplexity int, short model.AbilityShortType) int
-		ArmorByID            func(childComplexity int, id string) int
-		ArmorList            func(childComplexity int) int
-		CharacterByID        func(childComplexity int, id string) int
-		ShieldList           func(childComplexity int) int
-		UserByID             func(childComplexity int, id string) int
-		UserList             func(childComplexity int) int
-		WeaponList           func(childComplexity int) int
+		AbilityDetailByShort   func(childComplexity int, short model.AbilityShortType) int
+		ArmorByID              func(childComplexity int, id string) int
+		ArmorList              func(childComplexity int) int
+		CharacterByID          func(childComplexity int, id string) int
+		EquipmentByCharacterID func(childComplexity int, characterID string) int
+		ShieldList             func(childComplexity int) int
+		UserByID               func(childComplexity int, id string) int
+		UserList               func(childComplexity int) int
+		WeaponList             func(childComplexity int) int
+	}
+
+	Shield struct {
+		ArmorClass            func(childComplexity int) int
+		ArmorType             func(childComplexity int) int
+		DescriptionEn         func(childComplexity int) int
+		ID                    func(childComplexity int) int
+		ImageURL              func(childComplexity int) int
+		MaximumPlusArmorClass func(childComplexity int) int
+		Name                  func(childComplexity int) int
+		Price                 func(childComplexity int) int
+		StealthAdvantageType  func(childComplexity int) int
+		StrRequirement        func(childComplexity int) int
+		Weight                func(childComplexity int) int
 	}
 
 	User struct {
@@ -155,6 +178,7 @@ type QueryResolver interface {
 	ArmorList(ctx context.Context) ([]*model.Armor, error)
 	ShieldList(ctx context.Context) ([]*model.Armor, error)
 	CharacterByID(ctx context.Context, id string) (*model.Character, error)
+	EquipmentByCharacterID(ctx context.Context, characterID string) (*model.Equipment, error)
 	UserByID(ctx context.Context, id string) (*model.User, error)
 	UserList(ctx context.Context) ([]*model.User, error)
 	WeaponList(ctx context.Context) ([]*model.Weapon, error)
@@ -368,6 +392,41 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Coin.Value(childComplexity), true
 
+	case "Equipment.armor":
+		if e.complexity.Equipment.Armor == nil {
+			break
+		}
+
+		return e.complexity.Equipment.Armor(childComplexity), true
+
+	case "Equipment.characterId":
+		if e.complexity.Equipment.CharacterID == nil {
+			break
+		}
+
+		return e.complexity.Equipment.CharacterID(childComplexity), true
+
+	case "Equipment.id":
+		if e.complexity.Equipment.ID == nil {
+			break
+		}
+
+		return e.complexity.Equipment.ID(childComplexity), true
+
+	case "Equipment.leftHanded":
+		if e.complexity.Equipment.LeftHanded == nil {
+			break
+		}
+
+		return e.complexity.Equipment.LeftHanded(childComplexity), true
+
+	case "Equipment.rightHanded":
+		if e.complexity.Equipment.RightHanded == nil {
+			break
+		}
+
+		return e.complexity.Equipment.RightHanded(childComplexity), true
+
 	case "ProficiencyDetail.description_en":
 		if e.complexity.ProficiencyDetail.DescriptionEn == nil {
 			break
@@ -432,6 +491,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.CharacterByID(childComplexity, args["id"].(string)), true
 
+	case "Query.equipmentByCharacterId":
+		if e.complexity.Query.EquipmentByCharacterID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_equipmentByCharacterId_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.EquipmentByCharacterID(childComplexity, args["characterId"].(string)), true
+
 	case "Query.shieldList":
 		if e.complexity.Query.ShieldList == nil {
 			break
@@ -464,6 +535,83 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.WeaponList(childComplexity), true
+
+	case "Shield.armorClass":
+		if e.complexity.Shield.ArmorClass == nil {
+			break
+		}
+
+		return e.complexity.Shield.ArmorClass(childComplexity), true
+
+	case "Shield.armorType":
+		if e.complexity.Shield.ArmorType == nil {
+			break
+		}
+
+		return e.complexity.Shield.ArmorType(childComplexity), true
+
+	case "Shield.descriptionEn":
+		if e.complexity.Shield.DescriptionEn == nil {
+			break
+		}
+
+		return e.complexity.Shield.DescriptionEn(childComplexity), true
+
+	case "Shield.id":
+		if e.complexity.Shield.ID == nil {
+			break
+		}
+
+		return e.complexity.Shield.ID(childComplexity), true
+
+	case "Shield.imageUrl":
+		if e.complexity.Shield.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.Shield.ImageURL(childComplexity), true
+
+	case "Shield.maximumPlusArmorClass":
+		if e.complexity.Shield.MaximumPlusArmorClass == nil {
+			break
+		}
+
+		return e.complexity.Shield.MaximumPlusArmorClass(childComplexity), true
+
+	case "Shield.name":
+		if e.complexity.Shield.Name == nil {
+			break
+		}
+
+		return e.complexity.Shield.Name(childComplexity), true
+
+	case "Shield.price":
+		if e.complexity.Shield.Price == nil {
+			break
+		}
+
+		return e.complexity.Shield.Price(childComplexity), true
+
+	case "Shield.stealthAdvantageType":
+		if e.complexity.Shield.StealthAdvantageType == nil {
+			break
+		}
+
+		return e.complexity.Shield.StealthAdvantageType(childComplexity), true
+
+	case "Shield.strRequirement":
+		if e.complexity.Shield.StrRequirement == nil {
+			break
+		}
+
+		return e.complexity.Shield.StrRequirement(childComplexity), true
+
+	case "Shield.weight":
+		if e.complexity.Shield.Weight == nil {
+			break
+		}
+
+		return e.complexity.Shield.Weight(childComplexity), true
 
 	case "User.displayName":
 		if e.complexity.User.DisplayName == nil {
@@ -770,7 +918,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/character.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
+//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/character.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -789,6 +937,7 @@ var sources = []*ast.Source{
 	{Name: "schema/coin.graphqls", Input: sourceData("schema/coin.graphqls"), BuiltIn: false},
 	{Name: "schema/damaged.graphqls", Input: sourceData("schema/damaged.graphqls"), BuiltIn: false},
 	{Name: "schema/dice.graphqls", Input: sourceData("schema/dice.graphqls"), BuiltIn: false},
+	{Name: "schema/equipment.graphqls", Input: sourceData("schema/equipment.graphqls"), BuiltIn: false},
 	{Name: "schema/proficiency_detail.graphqls", Input: sourceData("schema/proficiency_detail.graphqls"), BuiltIn: false},
 	{Name: "schema/user.graphqls", Input: sourceData("schema/user.graphqls"), BuiltIn: false},
 	{Name: "schema/weapon.graphqls", Input: sourceData("schema/weapon.graphqls"), BuiltIn: false},
@@ -885,6 +1034,29 @@ func (ec *executionContext) field_Query_characterById_argsID(
 ) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_equipmentByCharacterId_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_equipmentByCharacterId_argsCharacterID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["characterId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_equipmentByCharacterId_argsCharacterID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("characterId"))
+	if tmp, ok := rawArgs["characterId"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -2231,6 +2403,310 @@ func (ec *executionContext) fieldContext_Coin_value(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Equipment_id(ctx context.Context, field graphql.CollectedField, obj *model.Equipment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Equipment_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Equipment_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Equipment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Equipment_characterId(ctx context.Context, field graphql.CollectedField, obj *model.Equipment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Equipment_characterId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Equipment_characterId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Equipment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Equipment_armor(ctx context.Context, field graphql.CollectedField, obj *model.Equipment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Equipment_armor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Armor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Armor)
+	fc.Result = res
+	return ec.marshalNArmor2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐArmor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Equipment_armor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Equipment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Armor_id(ctx, field)
+			case "armorType":
+				return ec.fieldContext_Armor_armorType(ctx, field)
+			case "name":
+				return ec.fieldContext_Armor_name(ctx, field)
+			case "armorClass":
+				return ec.fieldContext_Armor_armorClass(ctx, field)
+			case "maximumPlusArmorClass":
+				return ec.fieldContext_Armor_maximumPlusArmorClass(ctx, field)
+			case "stealthAdvantageType":
+				return ec.fieldContext_Armor_stealthAdvantageType(ctx, field)
+			case "price":
+				return ec.fieldContext_Armor_price(ctx, field)
+			case "strRequirement":
+				return ec.fieldContext_Armor_strRequirement(ctx, field)
+			case "descriptionEn":
+				return ec.fieldContext_Armor_descriptionEn(ctx, field)
+			case "weight":
+				return ec.fieldContext_Armor_weight(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Armor_imageUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Equipment_rightHanded(ctx context.Context, field graphql.CollectedField, obj *model.Equipment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Equipment_rightHanded(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RightHanded, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Weapon)
+	fc.Result = res
+	return ec.marshalNWeapon2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐWeapon(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Equipment_rightHanded(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Equipment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Weapon_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Weapon_name(ctx, field)
+			case "diceQuantity":
+				return ec.fieldContext_Weapon_diceQuantity(ctx, field)
+			case "descriptionEn":
+				return ec.fieldContext_Weapon_descriptionEn(ctx, field)
+			case "descriptionTh":
+				return ec.fieldContext_Weapon_descriptionTh(ctx, field)
+			case "diceRollType":
+				return ec.fieldContext_Weapon_diceRollType(ctx, field)
+			case "damagedType":
+				return ec.fieldContext_Weapon_damagedType(ctx, field)
+			case "weight":
+				return ec.fieldContext_Weapon_weight(ctx, field)
+			case "price":
+				return ec.fieldContext_Weapon_price(ctx, field)
+			case "weaponMastery":
+				return ec.fieldContext_Weapon_weaponMastery(ctx, field)
+			case "weaponProperty":
+				return ec.fieldContext_Weapon_weaponProperty(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Weapon_imageUrl(ctx, field)
+			case "normalRange":
+				return ec.fieldContext_Weapon_normalRange(ctx, field)
+			case "longRange":
+				return ec.fieldContext_Weapon_longRange(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Weapon", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Equipment_leftHanded(ctx context.Context, field graphql.CollectedField, obj *model.Equipment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Equipment_leftHanded(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LeftHanded, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Weapon)
+	fc.Result = res
+	return ec.marshalNWeapon2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐWeapon(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Equipment_leftHanded(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Equipment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Weapon_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Weapon_name(ctx, field)
+			case "diceQuantity":
+				return ec.fieldContext_Weapon_diceQuantity(ctx, field)
+			case "descriptionEn":
+				return ec.fieldContext_Weapon_descriptionEn(ctx, field)
+			case "descriptionTh":
+				return ec.fieldContext_Weapon_descriptionTh(ctx, field)
+			case "diceRollType":
+				return ec.fieldContext_Weapon_diceRollType(ctx, field)
+			case "damagedType":
+				return ec.fieldContext_Weapon_damagedType(ctx, field)
+			case "weight":
+				return ec.fieldContext_Weapon_weight(ctx, field)
+			case "price":
+				return ec.fieldContext_Weapon_price(ctx, field)
+			case "weaponMastery":
+				return ec.fieldContext_Weapon_weaponMastery(ctx, field)
+			case "weaponProperty":
+				return ec.fieldContext_Weapon_weaponProperty(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_Weapon_imageUrl(ctx, field)
+			case "normalRange":
+				return ec.fieldContext_Weapon_normalRange(ctx, field)
+			case "longRange":
+				return ec.fieldContext_Weapon_longRange(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Weapon", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProficiencyDetail_name(ctx context.Context, field graphql.CollectedField, obj *model.ProficiencyDetail) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProficiencyDetail_name(ctx, field)
 	if err != nil {
@@ -2718,6 +3194,73 @@ func (ec *executionContext) fieldContext_Query_characterById(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_equipmentByCharacterId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_equipmentByCharacterId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().EquipmentByCharacterID(rctx, fc.Args["characterId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Equipment)
+	fc.Result = res
+	return ec.marshalNEquipment2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐEquipment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_equipmentByCharacterId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Equipment_id(ctx, field)
+			case "characterId":
+				return ec.fieldContext_Equipment_characterId(ctx, field)
+			case "armor":
+				return ec.fieldContext_Equipment_armor(ctx, field)
+			case "rightHanded":
+				return ec.fieldContext_Equipment_rightHanded(ctx, field)
+			case "leftHanded":
+				return ec.fieldContext_Equipment_leftHanded(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_equipmentByCharacterId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_userById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_userById(ctx, field)
 	if err != nil {
@@ -3041,6 +3584,498 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_id(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_armorType(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_armorType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ArmorType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ArmorType)
+	fc.Result = res
+	return ec.marshalNArmorType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐArmorType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_armorType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ArmorType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_name(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_armorClass(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_armorClass(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ArmorClass, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_armorClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_maximumPlusArmorClass(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_maximumPlusArmorClass(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaximumPlusArmorClass, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int32)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_maximumPlusArmorClass(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_stealthAdvantageType(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_stealthAdvantageType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StealthAdvantageType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.AdvantageType)
+	fc.Result = res
+	return ec.marshalNAdvantageType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAdvantageType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_stealthAdvantageType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AdvantageType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_price(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_price(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Coin)
+	fc.Result = res
+	return ec.marshalNCoin2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoin(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_price(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_Coin_name(ctx, field)
+			case "shortType":
+				return ec.fieldContext_Coin_shortType(ctx, field)
+			case "value":
+				return ec.fieldContext_Coin_value(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Coin", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_strRequirement(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_strRequirement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StrRequirement, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int32)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_strRequirement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_descriptionEn(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_descriptionEn(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionEn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_descriptionEn(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_weight(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_weight(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Weight)
+	fc.Result = res
+	return ec.marshalNWeight2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐWeight(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_weight(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "value":
+				return ec.fieldContext_Weight_value(ctx, field)
+			case "unit":
+				return ec.fieldContext_Weight_unit(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Weight", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Shield_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.Shield) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Shield_imageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Shield_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Shield",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6666,6 +7701,65 @@ func (ec *executionContext) _Coin(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var equipmentImplementors = []string{"Equipment"}
+
+func (ec *executionContext) _Equipment(ctx context.Context, sel ast.SelectionSet, obj *model.Equipment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, equipmentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Equipment")
+		case "id":
+			out.Values[i] = ec._Equipment_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "characterId":
+			out.Values[i] = ec._Equipment_characterId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "armor":
+			out.Values[i] = ec._Equipment_armor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "rightHanded":
+			out.Values[i] = ec._Equipment_rightHanded(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "leftHanded":
+			out.Values[i] = ec._Equipment_leftHanded(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var proficiencyDetailImplementors = []string{"ProficiencyDetail"}
 
 func (ec *executionContext) _ProficiencyDetail(ctx context.Context, sel ast.SelectionSet, obj *model.ProficiencyDetail) graphql.Marshaler {
@@ -6844,6 +7938,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "equipmentByCharacterId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_equipmentByCharacterId(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "userById":
 			field := field
 
@@ -6918,6 +8034,89 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var shieldImplementors = []string{"Shield"}
+
+func (ec *executionContext) _Shield(ctx context.Context, sel ast.SelectionSet, obj *model.Shield) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, shieldImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Shield")
+		case "id":
+			out.Values[i] = ec._Shield_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "armorType":
+			out.Values[i] = ec._Shield_armorType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Shield_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "armorClass":
+			out.Values[i] = ec._Shield_armorClass(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maximumPlusArmorClass":
+			out.Values[i] = ec._Shield_maximumPlusArmorClass(ctx, field, obj)
+		case "stealthAdvantageType":
+			out.Values[i] = ec._Shield_stealthAdvantageType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "price":
+			out.Values[i] = ec._Shield_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "strRequirement":
+			out.Values[i] = ec._Shield_strRequirement(ctx, field, obj)
+		case "descriptionEn":
+			out.Values[i] = ec._Shield_descriptionEn(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "weight":
+			out.Values[i] = ec._Shield_weight(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "imageUrl":
+			out.Values[i] = ec._Shield_imageUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7765,6 +8964,20 @@ func (ec *executionContext) unmarshalNDiceRollType2githubᚗcomᚋballinwzaᚋbe
 
 func (ec *executionContext) marshalNDiceRollType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐDiceRollType(ctx context.Context, sel ast.SelectionSet, v model.DiceRollType) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) marshalNEquipment2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐEquipment(ctx context.Context, sel ast.SelectionSet, v model.Equipment) graphql.Marshaler {
+	return ec._Equipment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEquipment2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐEquipment(ctx context.Context, sel ast.SelectionSet, v *model.Equipment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Equipment(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {

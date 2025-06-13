@@ -64,3 +64,49 @@ func (r *WeaponRepository) FindAll(ctx context.Context) ([]*weapon_outbound_enti
 
 	return result, nil
 }
+
+func (r *WeaponRepository) FindById(ctx context.Context, id bson.ObjectID) (*weapon_outbound_entity.WeaponEntity, error) {
+	pipeline := mongo.Pipeline{
+		bson.D{
+			bson.E{Key: "$lookup", Value: bson.D{
+				bson.E{Key: "from", Value: "weapon_mastery"},
+				bson.E{Key: "localField", Value: "mastery_id"},
+				bson.E{Key: "foreignField", Value: "_id"},
+				bson.E{Key: "as", Value: "mastery_id"},
+			}},
+		},
+		bson.D{bson.E{Key: "$unwind", Value: "$mastery_id"}},
+		bson.D{
+			bson.E{Key: "$lookup", Value: bson.D{
+				bson.E{Key: "from", Value: "weapon_property"},
+				bson.E{Key: "localField", Value: "property_id"},
+				bson.E{Key: "foreignField", Value: "_id"},
+				bson.E{Key: "as", Value: "property_id"},
+			}},
+		},
+	}
+
+	cursor, err := r.collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Println("WeaponRepository.FindAll Error : Not founded document")
+			return nil, mongo.ErrNoDocuments
+		}
+
+		log.Println("WeaponRepository.FindAll Error : ", err)
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	if cursor.Next(ctx) {
+		var result *weapon_outbound_entity.WeaponEntity
+		if err := cursor.Decode(&result); err != nil {
+			log.Println("EquipmentRepository.FindByCharacterId decode error : ", err)
+			return nil, err
+		}
+		return result, nil
+	}
+
+	return nil, err
+}
