@@ -79,12 +79,23 @@ type Shield struct {
 	ImageURL              string        `json:"imageUrl"`
 }
 
+type Subscription struct {
+}
+
 type User struct {
 	ID          string `json:"id"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
 	DisplayName string `json:"displayName"`
 	UserImage   string `json:"userImage"`
+}
+
+type WatchEquipment struct {
+	ID          *string `json:"id,omitempty"`
+	CharacterID *string `json:"characterId,omitempty"`
+	Armor       *string `json:"armor,omitempty"`
+	RightHanded *string `json:"rightHanded,omitempty"`
+	LeftHanded  *string `json:"leftHanded,omitempty"`
 }
 
 type Weapon struct {

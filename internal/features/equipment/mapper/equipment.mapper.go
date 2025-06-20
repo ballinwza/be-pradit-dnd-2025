@@ -19,3 +19,19 @@ func MapperEquipmentEntityToModel(entity equipment_outbound_entity.EquipmentEnti
 		LeftHanded:  &afterMappingLeftHanded,
 	}
 }
+
+func MapEquipmentEntityToGqlModel(entity *equipment_outbound_entity.WatchEquipmentEntity) *model.WatchEquipment {
+	id := entity.Id.Hex()
+	cId := entity.CharacterId.Hex()
+	aId := entity.ArmorId.Hex()
+	rId := entity.RightHandedId.Hex()
+	lId := entity.LeftHandedId.Hex()
+
+	return &model.WatchEquipment{
+		ID:          &id,
+		CharacterID: &cId,
+		Armor:       &aId,
+		RightHanded: &rId,
+		LeftHanded:  &lId,
+	}
+}

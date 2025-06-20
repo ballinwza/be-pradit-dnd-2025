@@ -20,3 +20,12 @@ func (r *queryResolver) EquipmentByCharacterID(ctx context.Context, characterID 
 	}
 	return result, nil
 }
+
+// WatchEquipmentByCharacterID is the resolver for the watchEquipmentByCharacterId field.
+func (r *subscriptionResolver) WatchEquipmentByCharacterID(ctx context.Context, characterID string) (<-chan *model.Equipment, error) {
+	result, err := r.EquipmentService.WatchEquipmentByCharacterId(ctx, characterID)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get EquipmentByCharacterId", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+	return result, nil
+}

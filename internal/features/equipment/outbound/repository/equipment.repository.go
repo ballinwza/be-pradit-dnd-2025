@@ -5,9 +5,12 @@ import (
 	"log"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/database"
+	equipment_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/mapper"
 	equipment_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/outbound/entity"
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type EquipmentRepository struct {
@@ -22,14 +25,7 @@ func NewEquipmentRepository() *EquipmentRepository {
 	}
 }
 
-// type EqpFilter struct {
-// 	ChracterId bson.ObjectID `bson:"character_id"`
-// }
-
 func (r *EquipmentRepository) FindByCharacterId(ctx context.Context, objId bson.ObjectID) (*equipment_outbound_entity.EquipmentEntity, error) {
-	// filter := EqpFilter{
-	// 	ChracterId: bson.ObjectIDFromHex("6839b9ad34d38e31825f2ba2"),
-	// }
 
 	pipeline := mongo.Pipeline{
 		bson.D{bson.E{Key: "$match", Value: bson.D{
@@ -124,4 +120,73 @@ func (r *EquipmentRepository) FindByCharacterId(ctx context.Context, objId bson.
 	}
 
 	return nil, err
+}
+
+func (r *EquipmentRepository) WatchByCharacterId(ctx context.Context, objId bson.ObjectID) (<-chan *model.Equipment, error) {
+	equipmentChan := make(chan *model.Equipment)
+
+	go func() {
+		defer close(equipmentChan)
+		log.Printf("EquipmentRepository : Starting Change Stream for equipment ID : %s", objId.String())
+
+		//Initial
+		initialEquipment, err := r.FindByCharacterId(ctx, objId)
+		if err != nil {
+			log.Println("EquipmentRepository.WatchByCharacterId Error : ", err)
+		} else if initialEquipment != nil {
+			log.Printf("EquipmentRepository : InitialEquipment : %s", objId.String())
+			resultMapping := equipment_mapper.MapperEquipmentEntityToModel(*initialEquipment)
+			equipmentChan <- &resultMapping
+		}
+
+		pipeline := mongo.Pipeline{
+			bson.D{{Key: "$match", Value: bson.D{
+				{Key: "operationType", Value: bson.D{
+					{Key: "$in", Value: bson.A{"insert", "update", "replace"}},
+				}},
+				{Key: "fullDocument.character_id", Value: objId},
+			}}},
+		}
+
+		changeStream, err := r.collection.Watch(ctx, pipeline, options.ChangeStream().SetFullDocument(options.UpdateLookup))
+		if err != nil {
+			log.Println("EquipmentRepository.WatchByCharacterId Error : ", err)
+			return
+		}
+
+		defer changeStream.Close(context.Background())
+
+		log.Println("Starting to listen for equipment changes...")
+		for changeStream.Next(ctx) {
+			var changeEvent struct {
+				FullDocument equipment_outbound_entity.WatchEquipmentEntity `bson:"fullDocument"`
+			}
+
+			if err := changeStream.Decode(&changeEvent); err != nil {
+				log.Println("EquipmentRepository.WatchByCharacterId decode Error : ", err)
+				continue
+			}
+
+			completeEquipment, err := r.FindByCharacterId(ctx, changeEvent.FullDocument.CharacterId)
+			if err != nil {
+				log.Println("EquipmentRepository.WatchByCharacterId Error : ", err)
+				continue
+			}
+
+			if completeEquipment == nil {
+				log.Println("EquipmentRepository.WatchByCharacterId return Nil equipment")
+				continue
+			}
+
+			log.Printf("Change detected for character: %s", changeEvent.FullDocument.CharacterId.Hex())
+			resultMapping := equipment_mapper.MapperEquipmentEntityToModel(*completeEquipment)
+			equipmentChan <- &resultMapping
+
+		}
+
+		log.Printf("EquipmentRepository.WatchByCharacterId stop streming !!")
+	}()
+
+	return equipmentChan, nil
+
 }

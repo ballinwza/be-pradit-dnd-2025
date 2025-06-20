@@ -16,3 +16,11 @@ type EquipmentEntity struct {
 	LeftHandedId  bson.ObjectID                       `bson:"left_handed_id" json:"left_handed_id"`
 	LeftHanded    weapon_outbound_entity.WeaponEntity `bson:"left_handed" json:"left_handed"`
 }
+
+type WatchEquipmentEntity struct {
+	Id            bson.ObjectID `bson:"_id,omitempty" json:"_id"`
+	CharacterId   bson.ObjectID `bson:"character_id" json:"character_id"`
+	ArmorId       bson.ObjectID `bson:"armor_id" json:"armor_id"`
+	RightHandedId bson.ObjectID `bson:"right_handed_id" json:"right_handed_id"`
+	LeftHandedId  bson.ObjectID `bson:"left_handed_id" json:"left_handed_id"`
+}

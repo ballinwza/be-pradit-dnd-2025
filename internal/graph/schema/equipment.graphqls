@@ -6,6 +6,18 @@ type Equipment {
   leftHanded: Weapon!
 }
 
+type WatchEquipment {
+  id: String
+  characterId: String
+  armor: String
+  rightHanded: String
+  leftHanded: String
+}
+
+extend type Subscription {
+  watchEquipmentByCharacterId(characterId: String!): Equipment!
+}
+
 extend type Query {
   equipmentByCharacterId(characterId: String!): Equipment!
 }
