@@ -9,6 +9,15 @@ import (
 	"strconv"
 )
 
+type Ability struct {
+	Strength     int32 `json:"strength"`
+	Dexterity    int32 `json:"dexterity"`
+	Constitution int32 `json:"constitution"`
+	Intelligence int32 `json:"intelligence"`
+	Wisdom       int32 `json:"wisdom"`
+	Charisma     int32 `json:"charisma"`
+}
+
 type AbilityDetail struct {
 	ID            string               `json:"id"`
 	Name          string               `json:"name"`
@@ -33,13 +42,14 @@ type Armor struct {
 }
 
 type Character struct {
-	ID              string `json:"id"`
-	User            *User  `json:"user"`
-	Name            string `json:"name"`
-	AvatarImage     string `json:"avatarImage"`
-	Speed           int32  `json:"speed"`
-	InitiativePoint int32  `json:"initiativePoint"`
-	HitDice         int32  `json:"hitDice"`
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	HitPoint    *HitPoint    `json:"hitPoint"`
+	CurrentExp  int32        `json:"currentExp"`
+	AvatarImage string       `json:"avatarImage"`
+	PocketMoney []*Coin      `json:"pocketMoney"`
+	Proficiency *Proficiency `json:"proficiency"`
+	Ability     *Ability     `json:"ability"`
 }
 
 type Coin struct {
@@ -54,6 +64,33 @@ type Equipment struct {
 	Armor       *Armor  `json:"armor"`
 	RightHanded *Weapon `json:"rightHanded"`
 	LeftHanded  *Weapon `json:"leftHanded"`
+}
+
+type HitPoint struct {
+	MaxHp       int32 `json:"maxHp"`
+	CurrrentHp  int32 `json:"currrentHp"`
+	TemporaryHp int32 `json:"temporaryHp"`
+}
+
+type Proficiency struct {
+	Athletics      int32 `json:"athletics"`
+	Arobatics      int32 `json:"arobatics"`
+	SleightOfHand  int32 `json:"sleight_of_hand"`
+	Stealth        int32 `json:"stealth"`
+	Arcana         int32 `json:"arcana"`
+	History        int32 `json:"history"`
+	Investigation  int32 `json:"investigation"`
+	Nature         int32 `json:"nature"`
+	Religion       int32 `json:"religion"`
+	AnimalHandling int32 `json:"animal_handling"`
+	Insight        int32 `json:"insight"`
+	Medicine       int32 `json:"medicine"`
+	Perception     int32 `json:"perception"`
+	Survival       int32 `json:"survival"`
+	Deception      int32 `json:"deception"`
+	Intimidation   int32 `json:"intimidation"`
+	Performance    int32 `json:"performance"`
+	Persuasion     int32 `json:"persuasion"`
 }
 
 type ProficiencyDetail struct {

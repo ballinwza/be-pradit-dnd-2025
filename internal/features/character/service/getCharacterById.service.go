@@ -9,9 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-
-
-func (s *CharacterService) GetCharacterById(ctx context.Context, id string) (*model.Character, error){
+func (s *CharacterService) GetCharacterById(ctx context.Context, id string) (*model.Character, error) {
 	obj, err := bson.ObjectIDFromHex(id)
 	if err != nil {
 		log.Printf("CharacterService.GetCharacterById Invalid ObjectId : %v\n", err)
@@ -25,5 +23,6 @@ func (s *CharacterService) GetCharacterById(ctx context.Context, id string) (*mo
 	}
 
 	afterMapping := character_mapper.MapperCharacterEntityToModel(*character)
+	// log.Println("Character : ", afterMapping)
 	return &afterMapping, nil
 }

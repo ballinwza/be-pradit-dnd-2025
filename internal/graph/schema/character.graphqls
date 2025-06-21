@@ -1,11 +1,48 @@
+type Ability {
+  strength: Int!
+  dexterity: Int!
+  constitution: Int!
+  intelligence: Int!
+  wisdom: Int!
+  charisma: Int!
+}
+
+type Proficiency {
+  athletics: Int!
+  arobatics: Int!
+  sleight_of_hand: Int!
+  stealth: Int!
+  arcana: Int!
+  history: Int!
+  investigation: Int!
+  nature: Int!
+  religion: Int!
+  animal_handling: Int!
+  insight: Int!
+  medicine: Int!
+  perception: Int!
+  survival: Int!
+  deception: Int!
+  intimidation: Int!
+  performance: Int!
+  persuasion: Int!
+}
+
+type HitPoint {
+  maxHp: Int!
+  currrentHp: Int!
+  temporaryHp: Int!
+}
+
 type Character {
   id: String!
-  user: User!
   name: String!
+  hitPoint: HitPoint!
+  currentExp: Int!
   avatarImage: String!
-  speed: Int!
-  initiativePoint: Int!
-  hitDice: Int!
+  pocketMoney: [Coin!]!
+  proficiency: Proficiency!
+  ability: Ability!
 }
 
 extend type Query {
