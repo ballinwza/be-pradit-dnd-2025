@@ -1,7 +1,0 @@
-extend type Query {
-  hello: String
-}
-
-extend type Subscription {
-  counter: Int!
-}

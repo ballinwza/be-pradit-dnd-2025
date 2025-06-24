@@ -155,7 +155,6 @@ type ComplexityRoot struct {
 		CharacterByID          func(childComplexity int, id string) int
 		ClassList              func(childComplexity int) int
 		EquipmentByCharacterID func(childComplexity int, characterID string) int
-		Hello                  func(childComplexity int) int
 		ShieldList             func(childComplexity int) int
 		UserByID               func(childComplexity int, id string) int
 		UserList               func(childComplexity int) int
@@ -177,7 +176,6 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		Counter                     func(childComplexity int) int
 		WatchCharacterByID          func(childComplexity int, id string) int
 		WatchEquipmentByCharacterID func(childComplexity int, characterID string) int
 	}
@@ -244,7 +242,6 @@ type QueryResolver interface {
 	ShieldList(ctx context.Context) ([]*model.Armor, error)
 	CharacterByID(ctx context.Context, id string) (*model.Character, error)
 	ClassList(ctx context.Context) ([]*model.Class, error)
-	Hello(ctx context.Context) (*string, error)
 	EquipmentByCharacterID(ctx context.Context, characterID string) (*model.Equipment, error)
 	UserByID(ctx context.Context, id string) (*model.User, error)
 	UserList(ctx context.Context) ([]*model.User, error)
@@ -252,7 +249,6 @@ type QueryResolver interface {
 }
 type SubscriptionResolver interface {
 	WatchCharacterByID(ctx context.Context, id string) (<-chan *model.Character, error)
-	Counter(ctx context.Context) (<-chan int32, error)
 	WatchEquipmentByCharacterID(ctx context.Context, characterID string) (<-chan *model.Equipment, error)
 }
 
@@ -827,13 +823,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.EquipmentByCharacterID(childComplexity, args["characterId"].(string)), true
 
-	case "Query.hello":
-		if e.complexity.Query.Hello == nil {
-			break
-		}
-
-		return e.complexity.Query.Hello(childComplexity), true
-
 	case "Query.shieldList":
 		if e.complexity.Query.ShieldList == nil {
 			break
@@ -943,13 +932,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Shield.Weight(childComplexity), true
-
-	case "Subscription.counter":
-		if e.complexity.Subscription.Counter == nil {
-			break
-		}
-
-		return e.complexity.Subscription.Counter(childComplexity), true
 
 	case "Subscription.watchCharacterById":
 		if e.complexity.Subscription.WatchCharacterByID == nil {
@@ -1332,7 +1314,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/character.graphqls" "schema/class.graphqls" "schema/coin.graphqls" "schema/counter.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
+//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/character.graphqls" "schema/class.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1350,7 +1332,6 @@ var sources = []*ast.Source{
 	{Name: "schema/character.graphqls", Input: sourceData("schema/character.graphqls"), BuiltIn: false},
 	{Name: "schema/class.graphqls", Input: sourceData("schema/class.graphqls"), BuiltIn: false},
 	{Name: "schema/coin.graphqls", Input: sourceData("schema/coin.graphqls"), BuiltIn: false},
-	{Name: "schema/counter.graphqls", Input: sourceData("schema/counter.graphqls"), BuiltIn: false},
 	{Name: "schema/damaged.graphqls", Input: sourceData("schema/damaged.graphqls"), BuiltIn: false},
 	{Name: "schema/dice.graphqls", Input: sourceData("schema/dice.graphqls"), BuiltIn: false},
 	{Name: "schema/equipment.graphqls", Input: sourceData("schema/equipment.graphqls"), BuiltIn: false},
@@ -5314,47 +5295,6 @@ func (ec *executionContext) fieldContext_Query_classList(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_hello(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Hello(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_hello(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_equipmentByCharacterId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_equipmentByCharacterId(ctx, field)
 	if err != nil {
@@ -6327,64 +6267,6 @@ func (ec *executionContext) fieldContext_Subscription_watchCharacterById(ctx con
 	if fc.Args, err = ec.field_Subscription_watchCharacterById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Subscription_counter(ctx context.Context, field graphql.CollectedField) (ret func(ctx context.Context) graphql.Marshaler) {
-	fc, err := ec.fieldContext_Subscription_counter(ctx, field)
-	if err != nil {
-		return nil
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = nil
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().Counter(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return nil
-	}
-	return func(ctx context.Context) graphql.Marshaler {
-		select {
-		case res, ok := <-resTmp.(<-chan int32):
-			if !ok {
-				return nil
-			}
-			return graphql.WriterFunc(func(w io.Writer) {
-				w.Write([]byte{'{'})
-				graphql.MarshalString(field.Alias).MarshalGQL(w)
-				w.Write([]byte{':'})
-				ec.marshalNInt2int32(ctx, field.Selections, res).MarshalGQL(w)
-				w.Write([]byte{'}'})
-			})
-		case <-ctx.Done():
-			return nil
-		}
-	}
-}
-
-func (ec *executionContext) fieldContext_Subscription_counter(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Subscription",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
 	}
 	return fc, nil
 }
@@ -10865,25 +10747,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "hello":
-			field := field
-
-			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_hello(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "equipmentByCharacterId":
 			field := field
 
@@ -11101,8 +10964,6 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	switch fields[0].Name {
 	case "watchCharacterById":
 		return ec._Subscription_watchCharacterById(ctx, fields[0])
-	case "counter":
-		return ec._Subscription_counter(ctx, fields[0])
 	case "watchEquipmentByCharacterId":
 		return ec._Subscription_watchEquipmentByCharacterId(ctx, fields[0])
 	default:
