@@ -24,16 +24,16 @@ const (
 )
 
 type ClassEntity struct {
-	Id                   bson.ObjectID                           `bson:"_id,omitempty"`
-	Name                 string                                  `bson:"name"`
-	DescriptionEn        string                                  `bson:"description_en"`
-	DescriptionTh        string                                  `bson:"description_th"`
-	DiceHpIncrease       core_outbound_entity.DiceRollTypeEntity `bson:"dice_hp_increase"`
-	FitProficiencyIds    []bson.ObjectID                         `bson:"fit_proficiency_ids"`
-	FitArmorTypes        []armor_outbound_entity.ArmorTypeEntity `bson:"fit_armor_types"`
-	FitWeaponProficiency []string                                `bson:"fit_armor_type"`
-	StarterEquipment     []bson.ObjectID                         `bson:"feature_ids"`
-	FeatureIds           []bson.ObjectID                         `bson:"feature_ids"`
+	Id                     bson.ObjectID                           `bson:"_id,omitempty"`
+	Name                   string                                  `bson:"name"`
+	DescriptionEn          string                                  `bson:"description_en"`
+	DescriptionTh          string                                  `bson:"description_th"`
+	DiceHpIncrease         core_outbound_entity.DiceRollTypeEntity `bson:"dice_hp_increase"`
+	FitProficiencyIds      []bson.ObjectID                         `bson:"fit_proficiency_ids"`
+	FitArmorTypes          []armor_outbound_entity.ArmorTypeEntity `bson:"fit_armor_types"`
+	FitWeaponProficiencies []string                                `bson:"fit_weapon_proficiencies"`
+	StarterEquipments      []ClassStartEquipmentEntity             `bson:"starter_equipments"`
+	// FeatureIds           []bson.ObjectID                         `bson:"feature_ids"`
 }
 
 type ClassStartEquipmentEntity struct {
