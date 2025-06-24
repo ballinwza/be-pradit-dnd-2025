@@ -76,9 +76,10 @@ type Equipment struct {
 }
 
 type HitPoint struct {
-	MaxHp       int32 `json:"maxHp"`
-	CurrrentHp  int32 `json:"currrentHp"`
-	TemporaryHp int32 `json:"temporaryHp"`
+	MaxHp          int32 `json:"maxHp"`
+	CurrrentHp     int32 `json:"currrentHp"`
+	TemporaryHp    int32 `json:"temporaryHp"`
+	MaxTemporaryHp int32 `json:"maxTemporaryHp"`
 }
 
 type Proficiency struct {

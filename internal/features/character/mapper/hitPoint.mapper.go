@@ -8,8 +8,9 @@ import (
 func MapperHitPointEntityToModel(entity character_outbound_entity.HitPointEntity) model.HitPoint {
 
 	return model.HitPoint{
-		MaxHp:       entity.MaxHp,
-		CurrrentHp:  entity.CurrentHp,
-		TemporaryHp: entity.TemporaryHp,
+		MaxHp:          entity.MaxHp,
+		CurrrentHp:     entity.CurrentHp,
+		TemporaryHp:    entity.TemporaryHp,
+		MaxTemporaryHp: entity.MaxTemporaryHp,
 	}
 }

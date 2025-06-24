@@ -115,9 +115,10 @@ type ComplexityRoot struct {
 	}
 
 	HitPoint struct {
-		CurrrentHp  func(childComplexity int) int
-		MaxHp       func(childComplexity int) int
-		TemporaryHp func(childComplexity int) int
+		CurrrentHp     func(childComplexity int) int
+		MaxHp          func(childComplexity int) int
+		MaxTemporaryHp func(childComplexity int) int
+		TemporaryHp    func(childComplexity int) int
 	}
 
 	Proficiency struct {
@@ -602,6 +603,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.HitPoint.MaxHp(childComplexity), true
+
+	case "HitPoint.maxTemporaryHp":
+		if e.complexity.HitPoint.MaxTemporaryHp == nil {
+			break
+		}
+
+		return e.complexity.HitPoint.MaxTemporaryHp(childComplexity), true
 
 	case "HitPoint.temporaryHp":
 		if e.complexity.HitPoint.TemporaryHp == nil {
@@ -2802,6 +2810,8 @@ func (ec *executionContext) fieldContext_Character_hitPoint(_ context.Context, f
 				return ec.fieldContext_HitPoint_currrentHp(ctx, field)
 			case "temporaryHp":
 				return ec.fieldContext_HitPoint_temporaryHp(ctx, field)
+			case "maxTemporaryHp":
+				return ec.fieldContext_HitPoint_maxTemporaryHp(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type HitPoint", field.Name)
 		},
@@ -3909,6 +3919,50 @@ func (ec *executionContext) _HitPoint_temporaryHp(ctx context.Context, field gra
 }
 
 func (ec *executionContext) fieldContext_HitPoint_temporaryHp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HitPoint",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _HitPoint_maxTemporaryHp(ctx context.Context, field graphql.CollectedField, obj *model.HitPoint) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HitPoint_maxTemporaryHp(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxTemporaryHp, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HitPoint_maxTemporaryHp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "HitPoint",
 		Field:      field,
@@ -10456,6 +10510,11 @@ func (ec *executionContext) _HitPoint(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "temporaryHp":
 			out.Values[i] = ec._HitPoint_temporaryHp(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxTemporaryHp":
+			out.Values[i] = ec._HitPoint_maxTemporaryHp(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

@@ -32,6 +32,7 @@ type HitPoint {
   maxHp: Int!
   currrentHp: Int!
   temporaryHp: Int!
+  maxTemporaryHp: Int!
 }
 
 type Character {
