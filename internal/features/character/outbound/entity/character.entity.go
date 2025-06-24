@@ -1,4 +1,4 @@
-package character_entity
+package character_outbound_entity
 
 import (
 	core_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/outbound/entity"
@@ -14,4 +14,5 @@ type CharacterEntity struct {
 	PocketMoney []core_outbound_entity.CoinEntity `bson:"pocket_money"`
 	Proficiency ProficiencyEntity                 `bson:"proficiency"`
 	Ability     AbilityEntity                     `bson:"ability"`
+	ClassId     bson.ObjectID                     `bson:"class_id,omitempty"`
 }

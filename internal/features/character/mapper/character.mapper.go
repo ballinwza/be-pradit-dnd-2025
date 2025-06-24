@@ -1,13 +1,13 @@
 package character_mapper
 
 import (
-	character_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
+	character_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
 	core_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/mapper"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func MapperCharacterEntityToModel(entity character_entity.CharacterEntity) model.Character {
+func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEntity) model.Character {
 	afterMappingHitPoint := MapperHitPointEntityToModel(entity.HitPoint)
 	afterMappingProficiency := MapperProficiencyEntityToModel(entity.Proficiency)
 	afterMappingAbility := MapperAbilityEntityToModel(entity.Ability)
@@ -27,5 +27,6 @@ func MapperCharacterEntityToModel(entity character_entity.CharacterEntity) model
 		PocketMoney: afterMappingPocketMoney,
 		Proficiency: &afterMappingProficiency,
 		Ability:     &afterMappingAbility,
+		ClassID:     entity.ClassId.Hex(),
 	}
 }

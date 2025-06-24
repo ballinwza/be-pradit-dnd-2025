@@ -134,7 +134,7 @@ func (r *EquipmentRepository) WatchByCharacterId(ctx context.Context, objId bson
 		if err != nil {
 			log.Println("EquipmentRepository.WatchByCharacterId Error : ", err)
 		} else if initialEquipment != nil {
-			log.Printf("EquipmentRepository : InitialEquipment : %s", objId.String())
+			log.Printf("EquipmentRepository was initiated : %s", objId.String())
 			resultMapping := equipment_mapper.MapperEquipmentEntityToModel(*initialEquipment)
 			equipmentChan <- &resultMapping
 		}
@@ -156,7 +156,7 @@ func (r *EquipmentRepository) WatchByCharacterId(ctx context.Context, objId bson
 
 		defer changeStream.Close(context.Background())
 
-		log.Println("Starting to listen for equipment changes...")
+		log.Println("Starting to listen for Equipment changes...")
 		for changeStream.Next(ctx) {
 			var changeEvent struct {
 				FullDocument equipment_outbound_entity.WatchEquipmentEntity `bson:"fullDocument"`
@@ -178,13 +178,13 @@ func (r *EquipmentRepository) WatchByCharacterId(ctx context.Context, objId bson
 				continue
 			}
 
-			log.Printf("Change detected for character: %s", changeEvent.FullDocument.CharacterId.Hex())
+			log.Printf("Change detected for equipment: %s", changeEvent.FullDocument.CharacterId.Hex())
 			resultMapping := equipment_mapper.MapperEquipmentEntityToModel(*completeEquipment)
 			equipmentChan <- &resultMapping
 
 		}
 
-		log.Printf("EquipmentRepository.WatchByCharacterId stop streming !!")
+		log.Printf("EquipmentRepository.WatchByCharacterId stop change streming !!")
 	}()
 
 	return equipmentChan, nil

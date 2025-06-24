@@ -1,4 +1,4 @@
-package character_entity
+package character_outbound_entity
 
 type AbilityEntity struct {
 	Strength     int32 `bson:"strength" `

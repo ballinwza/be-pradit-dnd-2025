@@ -1,4 +1,4 @@
-package character_entity
+package character_outbound_entity
 
 type HitPointEntity struct {
 	MaxHp       int32 `bson:"max_hp"`

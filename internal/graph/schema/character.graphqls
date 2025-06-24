@@ -43,6 +43,11 @@ type Character {
   pocketMoney: [Coin!]!
   proficiency: Proficiency!
   ability: Ability!
+  classId: String!
+}
+
+extend type Subscription {
+  watchCharacterById(id: String!): Character!
 }
 
 extend type Query {

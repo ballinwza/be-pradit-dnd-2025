@@ -1,4 +1,4 @@
-package character_entity
+package character_outbound_entity
 
 type ProficiencyEntity struct {
 	Athletics      int32 `bson:"athletics" json:"athletics"`

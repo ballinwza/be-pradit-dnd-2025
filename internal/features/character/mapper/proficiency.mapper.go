@@ -1,11 +1,11 @@
 package character_mapper
 
 import (
-	character_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
+	character_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func MapperProficiencyEntityToModel(entity character_entity.ProficiencyEntity) model.Proficiency {
+func MapperProficiencyEntityToModel(entity character_outbound_entity.ProficiencyEntity) model.Proficiency {
 
 	return model.Proficiency{
 		Athletics:      entity.Athletics,
