@@ -1,0 +1,12 @@
+type Class {
+  id: String!
+  name: String!
+  descriptionEn: String!
+  descriptionTh: String!
+  diceHpIncrease: DiceRollType!
+  #   primaryAbility: String!
+}
+
+extend type Query {
+  classList: [Class!]!
+}

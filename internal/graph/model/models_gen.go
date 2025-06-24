@@ -50,6 +50,15 @@ type Character struct {
 	PocketMoney []*Coin      `json:"pocketMoney"`
 	Proficiency *Proficiency `json:"proficiency"`
 	Ability     *Ability     `json:"ability"`
+	ClassID     string       `json:"classId"`
+}
+
+type Class struct {
+	ID             string       `json:"id"`
+	Name           string       `json:"name"`
+	DescriptionEn  string       `json:"descriptionEn"`
+	DescriptionTh  string       `json:"descriptionTh"`
+	DiceHpIncrease DiceRollType `json:"diceHpIncrease"`
 }
 
 type Coin struct {

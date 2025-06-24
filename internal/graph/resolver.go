@@ -4,6 +4,7 @@ import (
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
 	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
+	class_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/class/service"
 	equipment_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	weapon_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/weapon/service"
@@ -20,4 +21,5 @@ type Resolver struct {
 	ArmorService         *armor_service.ArmorService
 	WeaponService        *weapon_service.WeaponService
 	EquipmentService     *equipment_service.EquipmentService
+	ClassService         *class_service.ClassService
 }
