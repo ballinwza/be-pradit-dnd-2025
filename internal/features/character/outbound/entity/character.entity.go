@@ -13,6 +13,6 @@ type CharacterEntity struct {
 	AvatarImage string                            `bson:"avatar_image"`
 	PocketMoney []core_outbound_entity.CoinEntity `bson:"pocket_money"`
 	Proficiency ProficiencyEntity                 `bson:"proficiency"`
-	Ability     AbilityEntity                     `bson:"ability"`
+	Ability     []AbilityEntity                   `bson:"abilities"`
 	ClassId     bson.ObjectID                     `bson:"class_id,omitempty"`
 }

@@ -48,15 +48,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Ability struct {
-		Charisma     func(childComplexity int) int
-		Constitution func(childComplexity int) int
-		Dexterity    func(childComplexity int) int
-		Intelligence func(childComplexity int) int
-		Strength     func(childComplexity int) int
-		Wisdom       func(childComplexity int) int
-	}
-
 	AbilityDetail struct {
 		DescriptionEn func(childComplexity int) int
 		DescriptionTh func(childComplexity int) int
@@ -90,6 +81,12 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 		PocketMoney func(childComplexity int) int
 		Proficiency func(childComplexity int) int
+	}
+
+	CharacterAbility struct {
+		Name      func(childComplexity int) int
+		ShortType func(childComplexity int) int
+		Value     func(childComplexity int) int
 	}
 
 	Class struct {
@@ -270,48 +267,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "Ability.charisma":
-		if e.complexity.Ability.Charisma == nil {
-			break
-		}
-
-		return e.complexity.Ability.Charisma(childComplexity), true
-
-	case "Ability.constitution":
-		if e.complexity.Ability.Constitution == nil {
-			break
-		}
-
-		return e.complexity.Ability.Constitution(childComplexity), true
-
-	case "Ability.dexterity":
-		if e.complexity.Ability.Dexterity == nil {
-			break
-		}
-
-		return e.complexity.Ability.Dexterity(childComplexity), true
-
-	case "Ability.intelligence":
-		if e.complexity.Ability.Intelligence == nil {
-			break
-		}
-
-		return e.complexity.Ability.Intelligence(childComplexity), true
-
-	case "Ability.strength":
-		if e.complexity.Ability.Strength == nil {
-			break
-		}
-
-		return e.complexity.Ability.Strength(childComplexity), true
-
-	case "Ability.wisdom":
-		if e.complexity.Ability.Wisdom == nil {
-			break
-		}
-
-		return e.complexity.Ability.Wisdom(childComplexity), true
 
 	case "AbilityDetail.description_en":
 		if e.complexity.AbilityDetail.DescriptionEn == nil {
@@ -494,6 +449,27 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Character.Proficiency(childComplexity), true
+
+	case "CharacterAbility.name":
+		if e.complexity.CharacterAbility.Name == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbility.Name(childComplexity), true
+
+	case "CharacterAbility.shortType":
+		if e.complexity.CharacterAbility.ShortType == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbility.ShortType(childComplexity), true
+
+	case "CharacterAbility.value":
+		if e.complexity.CharacterAbility.Value == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbility.Value(childComplexity), true
 
 	case "Class.descriptionEn":
 		if e.complexity.Class.DescriptionEn == nil {
@@ -1629,270 +1605,6 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _Ability_strength(ctx context.Context, field graphql.CollectedField, obj *model.Ability) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ability_strength(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Strength, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Ability_strength(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Ability",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Ability_dexterity(ctx context.Context, field graphql.CollectedField, obj *model.Ability) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ability_dexterity(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Dexterity, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Ability_dexterity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Ability",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Ability_constitution(ctx context.Context, field graphql.CollectedField, obj *model.Ability) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ability_constitution(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Constitution, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Ability_constitution(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Ability",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Ability_intelligence(ctx context.Context, field graphql.CollectedField, obj *model.Ability) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ability_intelligence(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Intelligence, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Ability_intelligence(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Ability",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Ability_wisdom(ctx context.Context, field graphql.CollectedField, obj *model.Ability) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ability_wisdom(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Wisdom, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Ability_wisdom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Ability",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Ability_charisma(ctx context.Context, field graphql.CollectedField, obj *model.Ability) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Ability_charisma(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Charisma, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int32)
-	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Ability_charisma(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Ability",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
 
 func (ec *executionContext) _AbilityDetail_id(ctx context.Context, field graphql.CollectedField, obj *model.AbilityDetail) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AbilityDetail_id(ctx, field)
@@ -3048,9 +2760,9 @@ func (ec *executionContext) _Character_ability(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Ability)
+	res := resTmp.([]*model.CharacterAbility)
 	fc.Result = res
-	return ec.marshalNAbility2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbility(ctx, field.Selections, res)
+	return ec.marshalNCharacterAbility2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Character_ability(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3061,20 +2773,14 @@ func (ec *executionContext) fieldContext_Character_ability(_ context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "strength":
-				return ec.fieldContext_Ability_strength(ctx, field)
-			case "dexterity":
-				return ec.fieldContext_Ability_dexterity(ctx, field)
-			case "constitution":
-				return ec.fieldContext_Ability_constitution(ctx, field)
-			case "intelligence":
-				return ec.fieldContext_Ability_intelligence(ctx, field)
-			case "wisdom":
-				return ec.fieldContext_Ability_wisdom(ctx, field)
-			case "charisma":
-				return ec.fieldContext_Ability_charisma(ctx, field)
+			case "name":
+				return ec.fieldContext_CharacterAbility_name(ctx, field)
+			case "value":
+				return ec.fieldContext_CharacterAbility_value(ctx, field)
+			case "shortType":
+				return ec.fieldContext_CharacterAbility_shortType(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Ability", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CharacterAbility", field.Name)
 		},
 	}
 	return fc, nil
@@ -3119,6 +2825,138 @@ func (ec *executionContext) fieldContext_Character_classId(_ context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbility_name(ctx context.Context, field graphql.CollectedField, obj *model.CharacterAbility) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbility_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbility_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbility",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbility_value(ctx context.Context, field graphql.CollectedField, obj *model.CharacterAbility) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbility_value(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbility_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbility",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbility_shortType(ctx context.Context, field graphql.CollectedField, obj *model.CharacterAbility) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbility_shortType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShortType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.AbilityShortType)
+	fc.Result = res
+	return ec.marshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbility_shortType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbility",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AbilityShortType does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9912,70 +9750,6 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** object.gotpl ****************************
 
-var abilityImplementors = []string{"Ability"}
-
-func (ec *executionContext) _Ability(ctx context.Context, sel ast.SelectionSet, obj *model.Ability) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, abilityImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Ability")
-		case "strength":
-			out.Values[i] = ec._Ability_strength(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "dexterity":
-			out.Values[i] = ec._Ability_dexterity(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "constitution":
-			out.Values[i] = ec._Ability_constitution(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "intelligence":
-			out.Values[i] = ec._Ability_intelligence(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "wisdom":
-			out.Values[i] = ec._Ability_wisdom(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "charisma":
-			out.Values[i] = ec._Ability_charisma(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var abilityDetailImplementors = []string{"AbilityDetail"}
 
 func (ec *executionContext) _AbilityDetail(ctx context.Context, sel ast.SelectionSet, obj *model.AbilityDetail) graphql.Marshaler {
@@ -10176,6 +9950,55 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 			}
 		case "classId":
 			out.Values[i] = ec._Character_classId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var characterAbilityImplementors = []string{"CharacterAbility"}
+
+func (ec *executionContext) _CharacterAbility(ctx context.Context, sel ast.SelectionSet, obj *model.CharacterAbility) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, characterAbilityImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CharacterAbility")
+		case "name":
+			out.Values[i] = ec._CharacterAbility_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "value":
+			out.Values[i] = ec._CharacterAbility_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "shortType":
+			out.Values[i] = ec._CharacterAbility_shortType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11669,16 +11492,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAbility2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbility(ctx context.Context, sel ast.SelectionSet, v *model.Ability) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Ability(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNAbilityDetail2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityDetail(ctx context.Context, sel ast.SelectionSet, v model.AbilityDetail) graphql.Marshaler {
 	return ec._AbilityDetail(ctx, sel, &v)
 }
@@ -11809,6 +11622,60 @@ func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋballinwzaᚋbe�
 		return graphql.Null
 	}
 	return ec._Character(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCharacterAbility2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CharacterAbility) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCharacterAbility2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbility(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNCharacterAbility2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbility(ctx context.Context, sel ast.SelectionSet, v *model.CharacterAbility) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CharacterAbility(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNClass2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Class) graphql.Marshaler {

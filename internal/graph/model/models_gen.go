@@ -9,15 +9,6 @@ import (
 	"strconv"
 )
 
-type Ability struct {
-	Strength     int32 `json:"strength"`
-	Dexterity    int32 `json:"dexterity"`
-	Constitution int32 `json:"constitution"`
-	Intelligence int32 `json:"intelligence"`
-	Wisdom       int32 `json:"wisdom"`
-	Charisma     int32 `json:"charisma"`
-}
-
 type AbilityDetail struct {
 	ID            string               `json:"id"`
 	Name          string               `json:"name"`
@@ -42,15 +33,21 @@ type Armor struct {
 }
 
 type Character struct {
-	ID          string       `json:"id"`
-	Name        string       `json:"name"`
-	HitPoint    *HitPoint    `json:"hitPoint"`
-	CurrentExp  int32        `json:"currentExp"`
-	AvatarImage string       `json:"avatarImage"`
-	PocketMoney []*Coin      `json:"pocketMoney"`
-	Proficiency *Proficiency `json:"proficiency"`
-	Ability     *Ability     `json:"ability"`
-	ClassID     string       `json:"classId"`
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	HitPoint    *HitPoint           `json:"hitPoint"`
+	CurrentExp  int32               `json:"currentExp"`
+	AvatarImage string              `json:"avatarImage"`
+	PocketMoney []*Coin             `json:"pocketMoney"`
+	Proficiency *Proficiency        `json:"proficiency"`
+	Ability     []*CharacterAbility `json:"ability"`
+	ClassID     string              `json:"classId"`
+}
+
+type CharacterAbility struct {
+	Name      string           `json:"name"`
+	Value     int32            `json:"value"`
+	ShortType AbilityShortType `json:"shortType"`
 }
 
 type Class struct {

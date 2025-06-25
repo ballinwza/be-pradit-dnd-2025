@@ -1,10 +1,7 @@
-type Ability {
-  strength: Int!
-  dexterity: Int!
-  constitution: Int!
-  intelligence: Int!
-  wisdom: Int!
-  charisma: Int!
+type CharacterAbility {
+  name: String!
+  value: Int!
+  shortType: AbilityShortType!
 }
 
 type Proficiency {
@@ -43,7 +40,7 @@ type Character {
   avatarImage: String!
   pocketMoney: [Coin!]!
   proficiency: Proficiency!
-  ability: Ability!
+  ability: [CharacterAbility!]!
   classId: String!
 }
 

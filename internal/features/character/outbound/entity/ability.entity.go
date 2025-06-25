@@ -1,10 +1,9 @@
 package character_outbound_entity
 
+import core_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/outbound/entity"
+
 type AbilityEntity struct {
-	Strength     int32 `bson:"strength" `
-	Dexterity    int32 `bson:"dexterity" `
-	Constitution int32 `bson:"constitution" `
-	Intelligence int32 `bson:"intelligence" `
-	Wisdom       int32 `bson:"wisdom" `
-	Charisma     int32 `bson:"charisma" `
+	Name      string                           `bson:"name"`
+	Value     int32                            `bson:"value"`
+	ShortType core_outbound_entity.AbilityType `bson:"short_type"`
 }
