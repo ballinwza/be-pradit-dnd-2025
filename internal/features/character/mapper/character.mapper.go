@@ -9,7 +9,8 @@ import (
 
 func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEntity) model.Character {
 	afterMappingHitPoint := MapperHitPointEntityToModel(entity.HitPoint)
-	afterMappingProficiency := MapperProficiencyEntityToModel(entity.Proficiency)
+
+	var afterMappingProficiency []*model.CharacterProficiency
 	var afterMappingAbility []*model.CharacterAbility
 	var afterMappingPocketMoney []*model.Coin
 
@@ -21,7 +22,10 @@ func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEnti
 		var coinModel model.Coin = core_mapper.MapperCoinEntityToModel(value)
 		afterMappingPocketMoney = append(afterMappingPocketMoney, &coinModel)
 	}
-
+	for _, value := range entity.Proficiency {
+		var proficiencyModel model.CharacterProficiency = MapperProficiencyEntityToModel(value)
+		afterMappingProficiency = append(afterMappingProficiency, &proficiencyModel)
+	}
 	return model.Character{
 		ID:          entity.Id.Hex(),
 		Name:        entity.Name,
@@ -29,7 +33,7 @@ func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEnti
 		CurrentExp:  entity.CurrentExp,
 		AvatarImage: entity.AvatarImage,
 		PocketMoney: afterMappingPocketMoney,
-		Proficiency: &afterMappingProficiency,
+		Proficiency: afterMappingProficiency,
 		Ability:     afterMappingAbility,
 		ClassID:     entity.ClassId.Hex(),
 	}

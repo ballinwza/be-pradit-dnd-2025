@@ -2,29 +2,16 @@ package character_mapper
 
 import (
 	character_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
+	core_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/mapper"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func MapperProficiencyEntityToModel(entity character_outbound_entity.ProficiencyEntity) model.Proficiency {
+func MapperProficiencyEntityToModel(entity character_outbound_entity.ProficiencyEntity) model.CharacterProficiency {
 
-	return model.Proficiency{
-		Athletics:      entity.Athletics,
-		Arobatics:      entity.Arobatics,
-		SleightOfHand:  entity.SleightOfHand,
-		Stealth:        entity.Stealth,
-		Arcana:         entity.Arcana,
-		History:        entity.History,
-		Investigation:  entity.Investigation,
-		Nature:         entity.Nature,
-		Religion:       entity.Religion,
-		AnimalHandling: entity.AnimalHandling,
-		Insight:        entity.Insight,
-		Medicine:       entity.Medicine,
-		Perception:     entity.Perception,
-		Survival:       entity.Survival,
-		Deception:      entity.Deception,
-		Intimidation:   entity.Intimidation,
-		Performance:    entity.Performance,
-		Persuasion:     entity.Persuasion,
+	return model.CharacterProficiency{
+		Name:                  core_mapper.MapperProficiencyTypeEntityToModel(entity.Name),
+		Value:                 entity.Value,
+		AbilityShortTypeGroup: core_mapper.MapperAbilityShortTypeEntityToModel(entity.AbilityShortGroup),
 	}
+
 }

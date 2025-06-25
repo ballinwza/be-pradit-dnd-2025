@@ -33,21 +33,27 @@ type Armor struct {
 }
 
 type Character struct {
-	ID          string              `json:"id"`
-	Name        string              `json:"name"`
-	HitPoint    *HitPoint           `json:"hitPoint"`
-	CurrentExp  int32               `json:"currentExp"`
-	AvatarImage string              `json:"avatarImage"`
-	PocketMoney []*Coin             `json:"pocketMoney"`
-	Proficiency *Proficiency        `json:"proficiency"`
-	Ability     []*CharacterAbility `json:"ability"`
-	ClassID     string              `json:"classId"`
+	ID          string                  `json:"id"`
+	Name        string                  `json:"name"`
+	HitPoint    *HitPoint               `json:"hitPoint"`
+	CurrentExp  int32                   `json:"currentExp"`
+	AvatarImage string                  `json:"avatarImage"`
+	PocketMoney []*Coin                 `json:"pocketMoney"`
+	Proficiency []*CharacterProficiency `json:"proficiency"`
+	Ability     []*CharacterAbility     `json:"ability"`
+	ClassID     string                  `json:"classId"`
 }
 
 type CharacterAbility struct {
 	Name      string           `json:"name"`
 	Value     int32            `json:"value"`
 	ShortType AbilityShortType `json:"shortType"`
+}
+
+type CharacterProficiency struct {
+	Name                  ProficiencyType  `json:"name"`
+	Value                 int32            `json:"value"`
+	AbilityShortTypeGroup AbilityShortType `json:"abilityShortTypeGroup"`
 }
 
 type Class struct {
@@ -77,27 +83,6 @@ type HitPoint struct {
 	CurrrentHp     int32 `json:"currrentHp"`
 	TemporaryHp    int32 `json:"temporaryHp"`
 	MaxTemporaryHp int32 `json:"maxTemporaryHp"`
-}
-
-type Proficiency struct {
-	Athletics      int32 `json:"athletics"`
-	Arobatics      int32 `json:"arobatics"`
-	SleightOfHand  int32 `json:"sleight_of_hand"`
-	Stealth        int32 `json:"stealth"`
-	Arcana         int32 `json:"arcana"`
-	History        int32 `json:"history"`
-	Investigation  int32 `json:"investigation"`
-	Nature         int32 `json:"nature"`
-	Religion       int32 `json:"religion"`
-	AnimalHandling int32 `json:"animal_handling"`
-	Insight        int32 `json:"insight"`
-	Medicine       int32 `json:"medicine"`
-	Perception     int32 `json:"perception"`
-	Survival       int32 `json:"survival"`
-	Deception      int32 `json:"deception"`
-	Intimidation   int32 `json:"intimidation"`
-	Performance    int32 `json:"performance"`
-	Persuasion     int32 `json:"persuasion"`
 }
 
 type ProficiencyDetail struct {
@@ -535,6 +520,93 @@ func (e *DiceRollType) UnmarshalJSON(b []byte) error {
 }
 
 func (e DiceRollType) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type ProficiencyType string
+
+const (
+	ProficiencyTypeAthletics      ProficiencyType = "ATHLETICS"
+	ProficiencyTypeArobatics      ProficiencyType = "AROBATICS"
+	ProficiencyTypeSleightofhand  ProficiencyType = "SLEIGHTOFHAND"
+	ProficiencyTypeStealth        ProficiencyType = "STEALTH"
+	ProficiencyTypeArcana         ProficiencyType = "ARCANA"
+	ProficiencyTypeHistory        ProficiencyType = "HISTORY"
+	ProficiencyTypeInvestigation  ProficiencyType = "INVESTIGATION"
+	ProficiencyTypeNature         ProficiencyType = "NATURE"
+	ProficiencyTypeReligion       ProficiencyType = "RELIGION"
+	ProficiencyTypeAnimalhandling ProficiencyType = "ANIMALHANDLING"
+	ProficiencyTypeInsight        ProficiencyType = "INSIGHT"
+	ProficiencyTypeMedicine       ProficiencyType = "MEDICINE"
+	ProficiencyTypePerception     ProficiencyType = "PERCEPTION"
+	ProficiencyTypeSurvival       ProficiencyType = "SURVIVAL"
+	ProficiencyTypeDeception      ProficiencyType = "DECEPTION"
+	ProficiencyTypeIntimidation   ProficiencyType = "INTIMIDATION"
+	ProficiencyTypePerformance    ProficiencyType = "PERFORMANCE"
+	ProficiencyTypePersuasion     ProficiencyType = "PERSUASION"
+)
+
+var AllProficiencyType = []ProficiencyType{
+	ProficiencyTypeAthletics,
+	ProficiencyTypeArobatics,
+	ProficiencyTypeSleightofhand,
+	ProficiencyTypeStealth,
+	ProficiencyTypeArcana,
+	ProficiencyTypeHistory,
+	ProficiencyTypeInvestigation,
+	ProficiencyTypeNature,
+	ProficiencyTypeReligion,
+	ProficiencyTypeAnimalhandling,
+	ProficiencyTypeInsight,
+	ProficiencyTypeMedicine,
+	ProficiencyTypePerception,
+	ProficiencyTypeSurvival,
+	ProficiencyTypeDeception,
+	ProficiencyTypeIntimidation,
+	ProficiencyTypePerformance,
+	ProficiencyTypePersuasion,
+}
+
+func (e ProficiencyType) IsValid() bool {
+	switch e {
+	case ProficiencyTypeAthletics, ProficiencyTypeArobatics, ProficiencyTypeSleightofhand, ProficiencyTypeStealth, ProficiencyTypeArcana, ProficiencyTypeHistory, ProficiencyTypeInvestigation, ProficiencyTypeNature, ProficiencyTypeReligion, ProficiencyTypeAnimalhandling, ProficiencyTypeInsight, ProficiencyTypeMedicine, ProficiencyTypePerception, ProficiencyTypeSurvival, ProficiencyTypeDeception, ProficiencyTypeIntimidation, ProficiencyTypePerformance, ProficiencyTypePersuasion:
+		return true
+	}
+	return false
+}
+
+func (e ProficiencyType) String() string {
+	return string(e)
+}
+
+func (e *ProficiencyType) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProficiencyType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProficiencyType", str)
+	}
+	return nil
+}
+
+func (e ProficiencyType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *ProficiencyType) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e ProficiencyType) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
