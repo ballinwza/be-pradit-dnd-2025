@@ -1,0 +1,10 @@
+type Level {
+  id: String
+  level: Int!
+  expToLevelUp: Int!
+  proficiencyBonusPoint: Int!
+}
+
+extend type Query {
+  levelList: [Level!]!
+}

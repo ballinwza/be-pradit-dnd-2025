@@ -85,6 +85,13 @@ type HitPoint struct {
 	MaxTemporaryHp int32 `json:"maxTemporaryHp"`
 }
 
+type Level struct {
+	ID                    *string `json:"id,omitempty"`
+	Level                 int32   `json:"level"`
+	ExpToLevelUp          int32   `json:"expToLevelUp"`
+	ProficiencyBonusPoint int32   `json:"proficiencyBonusPoint"`
+}
+
 type ProficiencyDetail struct {
 	Name          string `json:"name"`
 	DescriptionEn string `json:"description_en"`

@@ -6,6 +6,7 @@ import (
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
 	class_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/class/service"
 	equipment_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/service"
+	level_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/level/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	weapon_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/weapon/service"
 )
@@ -22,4 +23,5 @@ type Resolver struct {
 	WeaponService        *weapon_service.WeaponService
 	EquipmentService     *equipment_service.EquipmentService
 	ClassService         *class_service.ClassService
+	LevelService         *level_service.LevelService
 }

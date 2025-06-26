@@ -5,9 +5,9 @@ import (
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
-func MapperProficiencyDetailEntityToModel(entity ability_detail_outbound_entity.ProficiencyDetailEntity) model.ProficiencyDetail{
+func MapperProficiencyDetailEntityToModel(entity ability_detail_outbound_entity.ProficiencyDetailEntity) model.ProficiencyDetail {
 	return model.ProficiencyDetail{
-		Name: entity.Name,
+		Name:          entity.Name,
 		DescriptionEn: entity.DescriptionEn,
 		DescriptionTh: entity.DescriptionTh,
 	}
