@@ -1,4 +1,4 @@
-package character_repository
+package character_outbound_repository
 
 import (
 	"context"
