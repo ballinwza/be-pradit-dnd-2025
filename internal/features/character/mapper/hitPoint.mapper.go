@@ -9,8 +9,16 @@ func MapperHitPointEntityToModel(entity character_outbound_entity.HitPointEntity
 
 	return model.HitPoint{
 		MaxHp:          entity.MaxHp,
-		CurrrentHp:     entity.CurrentHp,
+		CurrentHp:      entity.CurrentHp,
 		TemporaryHp:    entity.TemporaryHp,
 		MaxTemporaryHp: entity.MaxTemporaryHp,
+	}
+}
+func MapperHitPointModelToEntity(hpModel model.HitPointReq) character_outbound_entity.HitPointEntity {
+	return character_outbound_entity.HitPointEntity{
+		MaxHp:          *hpModel.MaxHp,
+		CurrentHp:      *hpModel.CurrentHp,
+		TemporaryHp:    *hpModel.TemporaryHp,
+		MaxTemporaryHp: *hpModel.MaxTemporaryHp,
 	}
 }

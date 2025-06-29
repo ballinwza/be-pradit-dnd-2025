@@ -50,7 +50,18 @@ type CharacterAbility struct {
 	ShortType AbilityShortType `json:"shortType"`
 }
 
+type CharacterAbilityReq struct {
+	Value     int32            `json:"value"`
+	ShortType AbilityShortType `json:"shortType"`
+}
+
 type CharacterProficiency struct {
+	Name                  ProficiencyType  `json:"name"`
+	Value                 int32            `json:"value"`
+	AbilityShortTypeGroup AbilityShortType `json:"abilityShortTypeGroup"`
+}
+
+type CharacterProficiencyReq struct {
 	Name                  ProficiencyType  `json:"name"`
 	Value                 int32            `json:"value"`
 	AbilityShortTypeGroup AbilityShortType `json:"abilityShortTypeGroup"`
@@ -70,6 +81,11 @@ type Coin struct {
 	Value     float64       `json:"value"`
 }
 
+type CoinReq struct {
+	ShortType CoinShortType `json:"shortType"`
+	Value     float64       `json:"value"`
+}
+
 type Equipment struct {
 	ID          string  `json:"id"`
 	CharacterID string  `json:"characterId"`
@@ -80,9 +96,16 @@ type Equipment struct {
 
 type HitPoint struct {
 	MaxHp          int32 `json:"maxHp"`
-	CurrrentHp     int32 `json:"currrentHp"`
+	CurrentHp      int32 `json:"currentHp"`
 	TemporaryHp    int32 `json:"temporaryHp"`
 	MaxTemporaryHp int32 `json:"maxTemporaryHp"`
+}
+
+type HitPointReq struct {
+	MaxHp          *int32 `json:"maxHp,omitempty"`
+	CurrentHp      *int32 `json:"currentHp,omitempty"`
+	TemporaryHp    *int32 `json:"temporaryHp,omitempty"`
+	MaxTemporaryHp *int32 `json:"maxTemporaryHp,omitempty"`
 }
 
 type Level struct {
@@ -92,6 +115,9 @@ type Level struct {
 	ProficiencyBonusPoint int32   `json:"proficiencyBonusPoint"`
 }
 
+type Mutation struct {
+}
+
 type ProficiencyDetail struct {
 	Name          string `json:"name"`
 	DescriptionEn string `json:"description_en"`
@@ -99,6 +125,18 @@ type ProficiencyDetail struct {
 }
 
 type Query struct {
+}
+
+type SaveCharacterReq struct {
+	ID          *string                    `json:"id,omitempty"`
+	Name        string                     `json:"name"`
+	HitPoint    *HitPointReq               `json:"hitPoint,omitempty"`
+	CurrentExp  *int32                     `json:"currentExp,omitempty"`
+	AvatarImage *string                    `json:"avatarImage,omitempty"`
+	PocketMoney []*CoinReq                 `json:"pocketMoney,omitempty"`
+	Proficiency []*CharacterProficiencyReq `json:"proficiency,omitempty"`
+	Ability     []*CharacterAbilityReq     `json:"ability,omitempty"`
+	ClassID     *string                    `json:"classId,omitempty"`
 }
 
 type Shield struct {

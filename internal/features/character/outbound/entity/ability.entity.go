@@ -4,6 +4,6 @@ import core_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/fe
 
 type AbilityEntity struct {
 	Name      string                           `bson:"name"`
-	Value     int32                            `bson:"value"`
+	Value     *int32                           `bson:"value,omitempty"`
 	ShortType core_outbound_entity.AbilityType `bson:"short_type"`
 }

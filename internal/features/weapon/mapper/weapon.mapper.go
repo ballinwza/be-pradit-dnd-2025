@@ -38,7 +38,7 @@ func MapperWeaponEntityToModel(entity weapon_outbound_entity.WeaponEntity) model
 		DiceRollType:   afterMappingDiceRoll,
 		DamagedType:    afterMappingDamageType,
 		Weight:         &afterMapperWeight,
-		Price:          &afterMappingPrice,
+		Price:          afterMappingPrice,
 		WeaponMastery:  &afterMappingMastery,
 		WeaponProperty: propertyListAfterMapping,
 		ImageURL:       entity.ImageUrl,

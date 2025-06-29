@@ -8,29 +8,11 @@ type CharacterProficiency {
   name: ProficiencyType!
   value: Int!
   abilityShortTypeGroup: AbilityShortType!
-  # athletics: Int!
-  # arobatics: Int!
-  # sleight_of_hand: Int!
-  # stealth: Int!
-  # arcana: Int!
-  # history: Int!
-  # investigation: Int!
-  # nature: Int!
-  # religion: Int!
-  # animal_handling: Int!
-  # insight: Int!
-  # medicine: Int!
-  # perception: Int!
-  # survival: Int!
-  # deception: Int!
-  # intimidation: Int!
-  # performance: Int!
-  # persuasion: Int!
 }
 
 type HitPoint {
   maxHp: Int!
-  currrentHp: Int!
+  currentHp: Int!
   temporaryHp: Int!
   maxTemporaryHp: Int!
 }

@@ -6,13 +6,13 @@ import (
 )
 
 type CharacterEntity struct {
-	Id          bson.ObjectID                     `bson:"_id,omitempty"`
-	Name        string                            `bson:"name"`
-	HitPoint    HitPointEntity                    `bson:"hit_point"`
-	CurrentExp  int32                             `bson:"current_exp"`
-	AvatarImage string                            `bson:"avatar_image"`
-	PocketMoney []core_outbound_entity.CoinEntity `bson:"pocket_money"`
-	Proficiency []ProficiencyEntity               `bson:"proficiencies"`
-	Ability     []AbilityEntity                   `bson:"abilities"`
-	ClassId     bson.ObjectID                     `bson:"class_id,omitempty"`
+	Id          *bson.ObjectID                     `bson:"_id,omitempty"`
+	Name        string                             `bson:"name"`
+	HitPoint    HitPointEntity                     `bson:"hit_point"`
+	CurrentExp  int32                              `bson:"current_exp"`
+	AvatarImage string                             `bson:"avatar_image"`
+	PocketMoney []*core_outbound_entity.CoinEntity `bson:"pocket_money"`
+	Proficiency []*CharacterProficiencyEntity      `bson:"proficiencies"`
+	Ability     []*AbilityEntity                   `bson:"abilities"`
+	ClassId     bson.ObjectID                      `bson:"class_id"`
 }

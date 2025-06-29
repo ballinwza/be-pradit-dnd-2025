@@ -40,6 +40,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
 }
@@ -118,7 +119,7 @@ type ComplexityRoot struct {
 	}
 
 	HitPoint struct {
-		CurrrentHp     func(childComplexity int) int
+		CurrentHp      func(childComplexity int) int
 		MaxHp          func(childComplexity int) int
 		MaxTemporaryHp func(childComplexity int) int
 		TemporaryHp    func(childComplexity int) int
@@ -129,6 +130,10 @@ type ComplexityRoot struct {
 		ID                    func(childComplexity int) int
 		Level                 func(childComplexity int) int
 		ProficiencyBonusPoint func(childComplexity int) int
+	}
+
+	Mutation struct {
+		SaveCharacter func(childComplexity int, data model.SaveCharacterReq) int
 	}
 
 	ProficiencyDetail struct {
@@ -225,6 +230,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type MutationResolver interface {
+	SaveCharacter(ctx context.Context, data model.SaveCharacterReq) (bool, error)
+}
 type QueryResolver interface {
 	AbilityDetailByShort(ctx context.Context, short model.AbilityShortType) (*model.AbilityDetail, error)
 	ArmorByID(ctx context.Context, id string) (*model.Armor, error)
@@ -577,12 +585,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Equipment.RightHanded(childComplexity), true
 
-	case "HitPoint.currrentHp":
-		if e.complexity.HitPoint.CurrrentHp == nil {
+	case "HitPoint.currentHp":
+		if e.complexity.HitPoint.CurrentHp == nil {
 			break
 		}
 
-		return e.complexity.HitPoint.CurrrentHp(childComplexity), true
+		return e.complexity.HitPoint.CurrentHp(childComplexity), true
 
 	case "HitPoint.maxHp":
 		if e.complexity.HitPoint.MaxHp == nil {
@@ -632,6 +640,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Level.ProficiencyBonusPoint(childComplexity), true
+
+	case "Mutation.saveCharacter":
+		if e.complexity.Mutation.SaveCharacter == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_saveCharacter_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SaveCharacter(childComplexity, args["data"].(model.SaveCharacterReq)), true
 
 	case "ProficiencyDetail.description_en":
 		if e.complexity.ProficiencyDetail.DescriptionEn == nil {
@@ -1116,7 +1136,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
-	inputUnmarshalMap := graphql.BuildUnmarshalerMap()
+	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCharacterAbilityReq,
+		ec.unmarshalInputCharacterProficiencyReq,
+		ec.unmarshalInputCoinReq,
+		ec.unmarshalInputHitPointReq,
+		ec.unmarshalInputSaveCharacterReq,
+	)
 	first := true
 
 	switch opCtx.Operation.Operation {
@@ -1149,6 +1175,21 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 
 			return &response
+		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
 		}
 	case ast.Subscription:
 		next := ec._Subscription(ctx, opCtx.Operation.SelectionSet)
@@ -1214,7 +1255,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/character.graphqls" "schema/class.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/level.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
+//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/character.graphqls" "schema/character.mutation.graphqls" "schema/class.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/level.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1230,6 +1271,7 @@ var sources = []*ast.Source{
 	{Name: "schema/advantage.graphqls", Input: sourceData("schema/advantage.graphqls"), BuiltIn: false},
 	{Name: "schema/armor.graphqls", Input: sourceData("schema/armor.graphqls"), BuiltIn: false},
 	{Name: "schema/character.graphqls", Input: sourceData("schema/character.graphqls"), BuiltIn: false},
+	{Name: "schema/character.mutation.graphqls", Input: sourceData("schema/character.mutation.graphqls"), BuiltIn: false},
 	{Name: "schema/class.graphqls", Input: sourceData("schema/class.graphqls"), BuiltIn: false},
 	{Name: "schema/coin.graphqls", Input: sourceData("schema/coin.graphqls"), BuiltIn: false},
 	{Name: "schema/damaged.graphqls", Input: sourceData("schema/damaged.graphqls"), BuiltIn: false},
@@ -1246,6 +1288,29 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_saveCharacter_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_saveCharacter_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_saveCharacter_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (model.SaveCharacterReq, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNSaveCharacterReq2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐSaveCharacterReq(ctx, tmp)
+	}
+
+	var zeroVal model.SaveCharacterReq
+	return zeroVal, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -2424,8 +2489,8 @@ func (ec *executionContext) fieldContext_Character_hitPoint(_ context.Context, f
 			switch field.Name {
 			case "maxHp":
 				return ec.fieldContext_HitPoint_maxHp(ctx, field)
-			case "currrentHp":
-				return ec.fieldContext_HitPoint_currrentHp(ctx, field)
+			case "currentHp":
+				return ec.fieldContext_HitPoint_currentHp(ctx, field)
 			case "temporaryHp":
 				return ec.fieldContext_HitPoint_temporaryHp(ctx, field)
 			case "maxTemporaryHp":
@@ -3689,8 +3754,8 @@ func (ec *executionContext) fieldContext_HitPoint_maxHp(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _HitPoint_currrentHp(ctx context.Context, field graphql.CollectedField, obj *model.HitPoint) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_HitPoint_currrentHp(ctx, field)
+func (ec *executionContext) _HitPoint_currentHp(ctx context.Context, field graphql.CollectedField, obj *model.HitPoint) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HitPoint_currentHp(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3703,7 +3768,7 @@ func (ec *executionContext) _HitPoint_currrentHp(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CurrrentHp, nil
+		return obj.CurrentHp, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3720,7 +3785,7 @@ func (ec *executionContext) _HitPoint_currrentHp(ctx context.Context, field grap
 	return ec.marshalNInt2int32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_HitPoint_currrentHp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_HitPoint_currentHp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "HitPoint",
 		Field:      field,
@@ -3990,6 +4055,61 @@ func (ec *executionContext) fieldContext_Level_proficiencyBonusPoint(_ context.C
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_saveCharacter(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_saveCharacter(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SaveCharacter(rctx, fc.Args["data"].(model.SaveCharacterReq))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_saveCharacter(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_saveCharacter_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -9204,6 +9324,246 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCharacterAbilityReq(ctx context.Context, obj any) (model.CharacterAbilityReq, error) {
+	var it model.CharacterAbilityReq
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"value", "shortType"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			data, err := ec.unmarshalNInt2int32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Value = data
+		case "shortType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shortType"))
+			data, err := ec.unmarshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ShortType = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCharacterProficiencyReq(ctx context.Context, obj any) (model.CharacterProficiencyReq, error) {
+	var it model.CharacterProficiencyReq
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "value", "abilityShortTypeGroup"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNProficiencyType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐProficiencyType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			data, err := ec.unmarshalNInt2int32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Value = data
+		case "abilityShortTypeGroup":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityShortTypeGroup"))
+			data, err := ec.unmarshalNAbilityShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐAbilityShortType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AbilityShortTypeGroup = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCoinReq(ctx context.Context, obj any) (model.CoinReq, error) {
+	var it model.CoinReq
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"shortType", "value"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "shortType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("shortType"))
+			data, err := ec.unmarshalNCoinShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoinShortType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ShortType = data
+		case "value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Value = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputHitPointReq(ctx context.Context, obj any) (model.HitPointReq, error) {
+	var it model.HitPointReq
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"maxHp", "currentHp", "temporaryHp", "maxTemporaryHp"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "maxHp":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxHp"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxHp = data
+		case "currentHp":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currentHp"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CurrentHp = data
+		case "temporaryHp":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("temporaryHp"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TemporaryHp = data
+		case "maxTemporaryHp":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxTemporaryHp"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MaxTemporaryHp = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSaveCharacterReq(ctx context.Context, obj any) (model.SaveCharacterReq, error) {
+	var it model.SaveCharacterReq
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "hitPoint", "currentExp", "avatarImage", "pocketMoney", "proficiency", "ability", "classId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "hitPoint":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hitPoint"))
+			data, err := ec.unmarshalOHitPointReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐHitPointReq(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HitPoint = data
+		case "currentExp":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currentExp"))
+			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CurrentExp = data
+		case "avatarImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatarImage"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AvatarImage = data
+		case "pocketMoney":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pocketMoney"))
+			data, err := ec.unmarshalOCoinReq2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoinReqᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PocketMoney = data
+		case "proficiency":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiency"))
+			data, err := ec.unmarshalOCharacterProficiencyReq2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReqᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Proficiency = data
+		case "ability":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ability"))
+			data, err := ec.unmarshalOCharacterAbilityReq2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReqᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Ability = data
+		case "classId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClassID = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -9719,8 +10079,8 @@ func (ec *executionContext) _HitPoint(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "currrentHp":
-			out.Values[i] = ec._HitPoint_currrentHp(ctx, field, obj)
+		case "currentHp":
+			out.Values[i] = ec._HitPoint_currentHp(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9782,6 +10142,55 @@ func (ec *executionContext) _Level(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "proficiencyBonusPoint":
 			out.Values[i] = ec._Level_proficiencyBonusPoint(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "saveCharacter":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_saveCharacter(ctx, field)
+			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11138,6 +11547,11 @@ func (ec *executionContext) marshalNCharacterAbility2ᚖgithubᚗcomᚋballinwza
 	return ec._CharacterAbility(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCharacterAbilityReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReq(ctx context.Context, v any) (*model.CharacterAbilityReq, error) {
+	res, err := ec.unmarshalInputCharacterAbilityReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNCharacterProficiency2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CharacterProficiency) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -11190,6 +11604,11 @@ func (ec *executionContext) marshalNCharacterProficiency2ᚖgithubᚗcomᚋballi
 		return graphql.Null
 	}
 	return ec._CharacterProficiency(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCharacterProficiencyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReq(ctx context.Context, v any) (*model.CharacterProficiencyReq, error) {
+	res, err := ec.unmarshalInputCharacterProficiencyReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNClass2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Class) graphql.Marshaler {
@@ -11298,6 +11717,11 @@ func (ec *executionContext) marshalNCoin2ᚖgithubᚗcomᚋballinwzaᚋbeᚑprad
 		return graphql.Null
 	}
 	return ec._Coin(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCoinReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoinReq(ctx context.Context, v any) (*model.CoinReq, error) {
+	res, err := ec.unmarshalInputCoinReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCoinShortType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoinShortType(ctx context.Context, v any) (model.CoinShortType, error) {
@@ -11502,6 +11926,11 @@ func (ec *executionContext) unmarshalNProficiencyType2githubᚗcomᚋballinwza�
 
 func (ec *executionContext) marshalNProficiencyType2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐProficiencyType(ctx context.Context, sel ast.SelectionSet, v model.ProficiencyType) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNSaveCharacterReq2githubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐSaveCharacterReq(ctx context.Context, v any) (model.SaveCharacterReq, error) {
+	res, err := ec.unmarshalInputSaveCharacterReq(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
@@ -11987,6 +12416,68 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOCharacterAbilityReq2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReqᚄ(ctx context.Context, v any) ([]*model.CharacterAbilityReq, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.CharacterAbilityReq, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCharacterAbilityReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReq(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCharacterProficiencyReq2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReqᚄ(ctx context.Context, v any) ([]*model.CharacterProficiencyReq, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.CharacterProficiencyReq, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCharacterProficiencyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReq(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCoinReq2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoinReqᚄ(ctx context.Context, v any) ([]*model.CoinReq, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.CoinReq, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCoinReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCoinReq(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOHitPointReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐHitPointReq(ctx context.Context, v any) (*model.HitPointReq, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputHitPointReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint32(ctx context.Context, v any) (*int32, error) {

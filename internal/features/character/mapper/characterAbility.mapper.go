@@ -10,7 +10,15 @@ func MapperAbilityEntityToModel(entity character_outbound_entity.AbilityEntity) 
 
 	return model.CharacterAbility{
 		Name:      entity.Name,
-		Value:     entity.Value,
+		Value:     *entity.Value,
 		ShortType: core_mapper.MapperAbilityShortTypeEntityToModel(entity.ShortType),
+	}
+}
+func MapperAbilityModelToEntity(model model.CharacterAbilityReq) *character_outbound_entity.AbilityEntity {
+	name, _ := core_mapper.MapperAbilityShortTypeToFullnameStringModelToEntity(model.ShortType)
+	return &character_outbound_entity.AbilityEntity{
+		Name:      name,
+		Value:     &model.Value,
+		ShortType: core_mapper.MapperAbilityShortTypeModelToEntity(model.ShortType),
 	}
 }

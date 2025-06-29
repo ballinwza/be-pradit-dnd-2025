@@ -1,0 +1,33 @@
+input CharacterAbilityReq {
+  value: Int!
+  shortType: AbilityShortType!
+}
+
+input CharacterProficiencyReq {
+  name: ProficiencyType!
+  value: Int!
+  abilityShortTypeGroup: AbilityShortType!
+}
+
+input HitPointReq {
+  maxHp: Int
+  currentHp: Int
+  temporaryHp: Int
+  maxTemporaryHp: Int
+}
+
+input SaveCharacterReq {
+  id: String
+  name: String!
+  hitPoint: HitPointReq
+  currentExp: Int
+  avatarImage: String
+  pocketMoney: [CoinReq!]
+  proficiency: [CharacterProficiencyReq!]
+  ability: [CharacterAbilityReq!]
+  classId: String
+}
+
+extend type Mutation {
+  saveCharacter(data: SaveCharacterReq!): Boolean!
+}

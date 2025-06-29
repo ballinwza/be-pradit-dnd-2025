@@ -22,7 +22,7 @@ func MapperArmorEntityToModel(entity armor_outbound_entity.ArmorEntity) model.Ar
 		ArmorClass:            entity.ArmorClass,
 		MaximumPlusArmorClass: entity.MaximumPlusArmorClass,
 		StealthAdvantageType:  core_mapper.MapperAdvantageTypeEntityToModel(entity.StealthAdvantage),
-		Price:                 &afterMapCoin,
+		Price:                 afterMapCoin,
 		StrRequirement:        entity.StrRequirement,
 		DescriptionEn:         entity.DescriptionEn,
 		Weight:                &afterMapWeight,

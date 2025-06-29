@@ -11,3 +11,8 @@ type Coin {
   shortType: CoinShortType!
   value: Float!
 }
+
+input CoinReq {
+  shortType: CoinShortType!
+  value: Float!
+}
