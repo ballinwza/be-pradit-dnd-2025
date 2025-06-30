@@ -2,23 +2,26 @@ package character_mapper
 
 import (
 	character_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
-	core_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/mapper"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
 )
 
 func MapperAbilityEntityToModel(entity character_outbound_entity.AbilityEntity) model.CharacterAbility {
-
 	return model.CharacterAbility{
-		Name:      entity.Name,
-		Value:     *entity.Value,
-		ShortType: core_mapper.MapperAbilityShortTypeEntityToModel(entity.ShortType),
+		Str: entity.Str,
+		Dex: entity.Dex,
+		Con: entity.Con,
+		Int: entity.Int,
+		Wis: entity.Wis,
+		Cha: entity.Cha,
 	}
 }
-func MapperAbilityModelToEntity(model model.CharacterAbilityReq) *character_outbound_entity.AbilityEntity {
-	name, _ := core_mapper.MapperAbilityShortTypeToFullnameStringModelToEntity(model.ShortType)
+func MapperAbilityModelToEntity(model *model.CharacterAbilityReq) *character_outbound_entity.AbilityEntity {
 	return &character_outbound_entity.AbilityEntity{
-		Name:      name,
-		Value:     &model.Value,
-		ShortType: core_mapper.MapperAbilityShortTypeModelToEntity(model.ShortType),
+		Str: model.Str,
+		Dex: model.Dex,
+		Con: model.Con,
+		Int: model.Int,
+		Wis: model.Wis,
+		Cha: model.Cha,
 	}
 }

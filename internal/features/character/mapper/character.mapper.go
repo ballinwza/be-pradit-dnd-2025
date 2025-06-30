@@ -2,8 +2,6 @@ package character_mapper
 
 import (
 	character_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
-	core_mapper "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/mapper"
-	core_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/core/outbound/entity"
 	"go.mongodb.org/mongo-driver/v2/bson"
 
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph/model"
@@ -11,23 +9,7 @@ import (
 
 func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEntity) model.Character {
 	afterMappingHitPoint := MapperHitPointEntityToModel(entity.HitPoint)
-
-	var afterMappingProficiency []*model.CharacterProficiency
-	var afterMappingAbility []*model.CharacterAbility
-	var afterMappingPocketMoney []*model.Coin
-
-	for _, value := range entity.Ability {
-		var abilityModel model.CharacterAbility = MapperAbilityEntityToModel(*value)
-		afterMappingAbility = append(afterMappingAbility, &abilityModel)
-	}
-	for _, value := range entity.PocketMoney {
-		coinModel := core_mapper.MapperCoinEntityToModel(*value)
-		afterMappingPocketMoney = append(afterMappingPocketMoney, coinModel)
-	}
-	for _, value := range entity.Proficiency {
-		var proficiencyModel model.CharacterProficiency = MapperCharacterProficiencyEntityToModel(*value)
-		afterMappingProficiency = append(afterMappingProficiency, &proficiencyModel)
-	}
+	afterMappingPocketMoney := MapperCharacterPocketMoneyEntityToModel(entity.PocketMoney)
 
 	chkId := entity.Id.Hex()
 	return model.Character{
@@ -37,31 +19,17 @@ func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEnti
 		CurrentExp:  entity.CurrentExp,
 		AvatarImage: entity.AvatarImage,
 		PocketMoney: afterMappingPocketMoney,
-		Proficiency: afterMappingProficiency,
-		Ability:     afterMappingAbility,
+		Proficiency: (*model.CharacterProficiency)(&entity.Proficiency),
+		Ability:     (*model.CharacterAbility)(&entity.Ability),
 		ClassID:     entity.ClassId.Hex(),
 	}
 }
 
 func MapperCharacterModelToEntity(req model.SaveCharacterReq) (*character_outbound_entity.CharacterEntity, error) {
 	afterMappingHitPoint := MapperHitPointModelToEntity(*req.HitPoint)
-
-	var afterMappingProficiency []*character_outbound_entity.CharacterProficiencyEntity
-	var afterMappingAbility []*character_outbound_entity.AbilityEntity
-	var afterMappingPocketMoney []*core_outbound_entity.CoinEntity
-
-	for _, value := range req.Ability {
-		abilityModel := MapperAbilityModelToEntity(*value)
-		afterMappingAbility = append(afterMappingAbility, abilityModel)
-	}
-	for _, value := range req.PocketMoney {
-		coinModel := core_mapper.MapperCoinModelToEntity(*value)
-		afterMappingPocketMoney = append(afterMappingPocketMoney, coinModel)
-	}
-	for _, value := range req.Proficiency {
-		proficiencyModel := MapperCharacterProficiencyModelToEntity(*value)
-		afterMappingProficiency = append(afterMappingProficiency, proficiencyModel)
-	}
+	afterMapAbility := MapperAbilityModelToEntity(req.Ability)
+	afterMapProficiency := MapperCharacterProficiencyModelToEntity(*req.Proficiency)
+	afterMappingPocketMoney := MapperCharacterPocketMoneyModelToEntity(*req.PocketMoney)
 
 	var objectId *bson.ObjectID
 	if req.ID != nil {
@@ -81,9 +49,9 @@ func MapperCharacterModelToEntity(req model.SaveCharacterReq) (*character_outbou
 		HitPoint:    afterMappingHitPoint,
 		CurrentExp:  *req.CurrentExp,
 		AvatarImage: *req.AvatarImage,
-		PocketMoney: afterMappingPocketMoney,
-		Proficiency: afterMappingProficiency,
-		Ability:     afterMappingAbility,
+		PocketMoney: *afterMappingPocketMoney,
+		Proficiency: *afterMapProficiency,
+		Ability:     *afterMapAbility,
 		ClassId:     *classObjId,
 	}
 

@@ -1,12 +1,31 @@
 input CharacterAbilityReq {
-  value: Int!
-  shortType: AbilityShortType!
+  str: Int
+  dex: Int
+  con: Int
+  int: Int
+  wis: Int
+  cha: Int
 }
 
 input CharacterProficiencyReq {
-  name: ProficiencyType!
-  value: Int!
-  abilityShortTypeGroup: AbilityShortType!
+  athletics: Int
+  arobatics: Int
+  sleightOfHand: Int
+  stealth: Int
+  arcana: Int
+  history: Int
+  investigation: Int
+  nature: Int
+  religion: Int
+  animalHandling: Int
+  insight: Int
+  medicine: Int
+  perception: Int
+  survival: Int
+  deception: Int
+  intimidation: Int
+  performance: Int
+  persuasion: Int
 }
 
 input HitPointReq {
@@ -16,15 +35,23 @@ input HitPointReq {
   maxTemporaryHp: Int
 }
 
+input CharacterPocketMoneyReq {
+  cp: Float
+  sp: Float
+  ep: Float
+  gp: Float
+  pp: Float
+}
+
 input SaveCharacterReq {
   id: String
   name: String!
   hitPoint: HitPointReq
   currentExp: Int
   avatarImage: String
-  pocketMoney: [CoinReq!]
-  proficiency: [CharacterProficiencyReq!]
-  ability: [CharacterAbilityReq!]
+  pocketMoney: CharacterPocketMoneyReq
+  proficiency: CharacterProficiencyReq
+  ability: CharacterAbilityReq
   classId: String
 }
 

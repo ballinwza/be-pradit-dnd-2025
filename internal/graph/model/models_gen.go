@@ -33,38 +33,91 @@ type Armor struct {
 }
 
 type Character struct {
-	ID          string                  `json:"id"`
-	Name        string                  `json:"name"`
-	HitPoint    *HitPoint               `json:"hitPoint"`
-	CurrentExp  int32                   `json:"currentExp"`
-	AvatarImage string                  `json:"avatarImage"`
-	PocketMoney []*Coin                 `json:"pocketMoney"`
-	Proficiency []*CharacterProficiency `json:"proficiency"`
-	Ability     []*CharacterAbility     `json:"ability"`
-	ClassID     string                  `json:"classId"`
+	ID          string                `json:"id"`
+	Name        string                `json:"name"`
+	HitPoint    *HitPoint             `json:"hitPoint"`
+	CurrentExp  int32                 `json:"currentExp"`
+	AvatarImage string                `json:"avatarImage"`
+	PocketMoney *CharacterPocketMoney `json:"pocketMoney,omitempty"`
+	Proficiency *CharacterProficiency `json:"proficiency,omitempty"`
+	Ability     *CharacterAbility     `json:"ability,omitempty"`
+	ClassID     string                `json:"classId"`
 }
 
 type CharacterAbility struct {
-	Name      string           `json:"name"`
-	Value     int32            `json:"value"`
-	ShortType AbilityShortType `json:"shortType"`
+	Str *int32 `json:"str,omitempty"`
+	Dex *int32 `json:"dex,omitempty"`
+	Con *int32 `json:"con,omitempty"`
+	Int *int32 `json:"int,omitempty"`
+	Wis *int32 `json:"wis,omitempty"`
+	Cha *int32 `json:"cha,omitempty"`
 }
 
 type CharacterAbilityReq struct {
-	Value     int32            `json:"value"`
-	ShortType AbilityShortType `json:"shortType"`
+	Str *int32 `json:"str,omitempty"`
+	Dex *int32 `json:"dex,omitempty"`
+	Con *int32 `json:"con,omitempty"`
+	Int *int32 `json:"int,omitempty"`
+	Wis *int32 `json:"wis,omitempty"`
+	Cha *int32 `json:"cha,omitempty"`
+}
+
+type CharacterPocketMoney struct {
+	Cp *float64 `json:"cp,omitempty"`
+	Sp *float64 `json:"sp,omitempty"`
+	Ep *float64 `json:"ep,omitempty"`
+	Gp *float64 `json:"gp,omitempty"`
+	Pp *float64 `json:"pp,omitempty"`
+}
+
+type CharacterPocketMoneyReq struct {
+	Cp *float64 `json:"cp,omitempty"`
+	Sp *float64 `json:"sp,omitempty"`
+	Ep *float64 `json:"ep,omitempty"`
+	Gp *float64 `json:"gp,omitempty"`
+	Pp *float64 `json:"pp,omitempty"`
 }
 
 type CharacterProficiency struct {
-	Name                  ProficiencyType  `json:"name"`
-	Value                 int32            `json:"value"`
-	AbilityShortTypeGroup AbilityShortType `json:"abilityShortTypeGroup"`
+	Athletics      *int32 `json:"athletics,omitempty"`
+	Arobatics      *int32 `json:"arobatics,omitempty"`
+	SleightOfHand  *int32 `json:"sleightOfHand,omitempty"`
+	Stealth        *int32 `json:"stealth,omitempty"`
+	Arcana         *int32 `json:"arcana,omitempty"`
+	History        *int32 `json:"history,omitempty"`
+	Investigation  *int32 `json:"investigation,omitempty"`
+	Nature         *int32 `json:"nature,omitempty"`
+	Religion       *int32 `json:"religion,omitempty"`
+	AnimalHandling *int32 `json:"animalHandling,omitempty"`
+	Insight        *int32 `json:"insight,omitempty"`
+	Medicine       *int32 `json:"medicine,omitempty"`
+	Perception     *int32 `json:"perception,omitempty"`
+	Survival       *int32 `json:"survival,omitempty"`
+	Deception      *int32 `json:"deception,omitempty"`
+	Intimidation   *int32 `json:"intimidation,omitempty"`
+	Performance    *int32 `json:"performance,omitempty"`
+	Persuasion     *int32 `json:"persuasion,omitempty"`
 }
 
 type CharacterProficiencyReq struct {
-	Name                  ProficiencyType  `json:"name"`
-	Value                 int32            `json:"value"`
-	AbilityShortTypeGroup AbilityShortType `json:"abilityShortTypeGroup"`
+	Athletics      *int32 `json:"athletics,omitempty"`
+	Arobatics      *int32 `json:"arobatics,omitempty"`
+	SleightOfHand  *int32 `json:"sleightOfHand,omitempty"`
+	Stealth        *int32 `json:"stealth,omitempty"`
+	Arcana         *int32 `json:"arcana,omitempty"`
+	History        *int32 `json:"history,omitempty"`
+	Investigation  *int32 `json:"investigation,omitempty"`
+	Nature         *int32 `json:"nature,omitempty"`
+	Religion       *int32 `json:"religion,omitempty"`
+	AnimalHandling *int32 `json:"animalHandling,omitempty"`
+	Insight        *int32 `json:"insight,omitempty"`
+	Medicine       *int32 `json:"medicine,omitempty"`
+	Perception     *int32 `json:"perception,omitempty"`
+	Survival       *int32 `json:"survival,omitempty"`
+	Deception      *int32 `json:"deception,omitempty"`
+	Intimidation   *int32 `json:"intimidation,omitempty"`
+	Performance    *int32 `json:"performance,omitempty"`
+	Persuasion     *int32 `json:"persuasion,omitempty"`
 }
 
 type Class struct {
@@ -128,15 +181,15 @@ type Query struct {
 }
 
 type SaveCharacterReq struct {
-	ID          *string                    `json:"id,omitempty"`
-	Name        string                     `json:"name"`
-	HitPoint    *HitPointReq               `json:"hitPoint,omitempty"`
-	CurrentExp  *int32                     `json:"currentExp,omitempty"`
-	AvatarImage *string                    `json:"avatarImage,omitempty"`
-	PocketMoney []*CoinReq                 `json:"pocketMoney,omitempty"`
-	Proficiency []*CharacterProficiencyReq `json:"proficiency,omitempty"`
-	Ability     []*CharacterAbilityReq     `json:"ability,omitempty"`
-	ClassID     *string                    `json:"classId,omitempty"`
+	ID          *string                  `json:"id,omitempty"`
+	Name        string                   `json:"name"`
+	HitPoint    *HitPointReq             `json:"hitPoint,omitempty"`
+	CurrentExp  *int32                   `json:"currentExp,omitempty"`
+	AvatarImage *string                  `json:"avatarImage,omitempty"`
+	PocketMoney *CharacterPocketMoneyReq `json:"pocketMoney,omitempty"`
+	Proficiency *CharacterProficiencyReq `json:"proficiency,omitempty"`
+	Ability     *CharacterAbilityReq     `json:"ability,omitempty"`
+	ClassID     *string                  `json:"classId,omitempty"`
 }
 
 type Shield struct {

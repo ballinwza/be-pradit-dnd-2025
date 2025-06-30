@@ -1,13 +1,31 @@
 type CharacterAbility {
-  name: String!
-  value: Int!
-  shortType: AbilityShortType!
+  str: Int
+  dex: Int
+  con: Int
+  int: Int
+  wis: Int
+  cha: Int
 }
 
 type CharacterProficiency {
-  name: ProficiencyType!
-  value: Int!
-  abilityShortTypeGroup: AbilityShortType!
+  athletics: Int
+  arobatics: Int
+  sleightOfHand: Int
+  stealth: Int
+  arcana: Int
+  history: Int
+  investigation: Int
+  nature: Int
+  religion: Int
+  animalHandling: Int
+  insight: Int
+  medicine: Int
+  perception: Int
+  survival: Int
+  deception: Int
+  intimidation: Int
+  performance: Int
+  persuasion: Int
 }
 
 type HitPoint {
@@ -23,10 +41,18 @@ type Character {
   hitPoint: HitPoint!
   currentExp: Int!
   avatarImage: String!
-  pocketMoney: [Coin!]!
-  proficiency: [CharacterProficiency!]!
-  ability: [CharacterAbility!]!
+  pocketMoney: CharacterPocketMoney
+  proficiency: CharacterProficiency
+  ability: CharacterAbility
   classId: String!
+}
+
+type CharacterPocketMoney {
+  cp: Float
+  sp: Float
+  ep: Float
+  gp: Float
+  pp: Float
 }
 
 extend type Subscription {
