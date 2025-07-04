@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 		PocketMoney func(childComplexity int) int
 		Proficiency func(childComplexity int) int
+		UserID      func(childComplexity int) int
 	}
 
 	CharacterAbility struct {
@@ -173,6 +174,7 @@ type ComplexityRoot struct {
 		ArmorByID              func(childComplexity int, id string) int
 		ArmorList              func(childComplexity int) int
 		CharacterByID          func(childComplexity int, id string) int
+		CharacterListByUserID  func(childComplexity int, userID string) int
 		ClassList              func(childComplexity int) int
 		EquipmentByCharacterID func(childComplexity int, characterID string) int
 		LevelList              func(childComplexity int) int
@@ -265,6 +267,7 @@ type QueryResolver interface {
 	ArmorList(ctx context.Context) ([]*model.Armor, error)
 	ShieldList(ctx context.Context) ([]*model.Armor, error)
 	CharacterByID(ctx context.Context, id string) (*model.Character, error)
+	CharacterListByUserID(ctx context.Context, userID string) ([]*model.Character, error)
 	ClassList(ctx context.Context) ([]*model.Class, error)
 	EquipmentByCharacterID(ctx context.Context, characterID string) (*model.Equipment, error)
 	LevelList(ctx context.Context) ([]*model.Level, error)
@@ -477,6 +480,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Character.Proficiency(childComplexity), true
+
+	case "Character.userId":
+		if e.complexity.Character.UserID == nil {
+			break
+		}
+
+		return e.complexity.Character.UserID(childComplexity), true
 
 	case "CharacterAbility.cha":
 		if e.complexity.CharacterAbility.Cha == nil {
@@ -903,6 +913,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.CharacterByID(childComplexity, args["id"].(string)), true
+
+	case "Query.characterListByUserId":
+		if e.complexity.Query.CharacterListByUserID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_characterListByUserId_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CharacterListByUserID(childComplexity, args["userId"].(string)), true
 
 	case "Query.classList":
 		if e.complexity.Query.ClassList == nil {
@@ -1585,6 +1607,29 @@ func (ec *executionContext) field_Query_characterById_argsID(
 ) (string, error) {
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_characterListByUserId_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_characterListByUserId_argsUserID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["userId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_characterListByUserId_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+	if tmp, ok := rawArgs["userId"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -2997,6 +3042,50 @@ func (ec *executionContext) _Character_classId(ctx context.Context, field graphq
 }
 
 func (ec *executionContext) fieldContext_Character_classId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Character",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Character_userId(ctx context.Context, field graphql.CollectedField, obj *model.Character) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Character_userId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Character_userId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Character",
 		Field:      field,
@@ -5731,6 +5820,8 @@ func (ec *executionContext) fieldContext_Query_characterById(ctx context.Context
 				return ec.fieldContext_Character_ability(ctx, field)
 			case "classId":
 				return ec.fieldContext_Character_classId(ctx, field)
+			case "userId":
+				return ec.fieldContext_Character_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
 		},
@@ -5743,6 +5834,83 @@ func (ec *executionContext) fieldContext_Query_characterById(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_characterById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_characterListByUserId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_characterListByUserId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CharacterListByUserID(rctx, fc.Args["userId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Character)
+	fc.Result = res
+	return ec.marshalNCharacter2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_characterListByUserId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Character_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Character_name(ctx, field)
+			case "hitPoint":
+				return ec.fieldContext_Character_hitPoint(ctx, field)
+			case "currentExp":
+				return ec.fieldContext_Character_currentExp(ctx, field)
+			case "avatarImage":
+				return ec.fieldContext_Character_avatarImage(ctx, field)
+			case "pocketMoney":
+				return ec.fieldContext_Character_pocketMoney(ctx, field)
+			case "proficiency":
+				return ec.fieldContext_Character_proficiency(ctx, field)
+			case "ability":
+				return ec.fieldContext_Character_ability(ctx, field)
+			case "classId":
+				return ec.fieldContext_Character_classId(ctx, field)
+			case "userId":
+				return ec.fieldContext_Character_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_characterListByUserId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6817,6 +6985,8 @@ func (ec *executionContext) fieldContext_Subscription_watchCharacterById(ctx con
 				return ec.fieldContext_Character_ability(ctx, field)
 			case "classId":
 				return ec.fieldContext_Character_classId(ctx, field)
+			case "userId":
+				return ec.fieldContext_Character_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
 		},
@@ -10820,7 +10990,7 @@ func (ec *executionContext) unmarshalInputSaveCharacterReq(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "hitPoint", "currentExp", "avatarImage", "pocketMoney", "proficiency", "ability", "classId"}
+	fieldsInOrder := [...]string{"id", "name", "hitPoint", "currentExp", "avatarImage", "pocketMoney", "proficiency", "ability", "classId", "userId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10843,53 +11013,60 @@ func (ec *executionContext) unmarshalInputSaveCharacterReq(ctx context.Context, 
 			it.Name = data
 		case "hitPoint":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hitPoint"))
-			data, err := ec.unmarshalOHitPointReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐHitPointReq(ctx, v)
+			data, err := ec.unmarshalNHitPointReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐHitPointReq(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.HitPoint = data
 		case "currentExp":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currentExp"))
-			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
+			data, err := ec.unmarshalNInt2int32(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CurrentExp = data
 		case "avatarImage":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatarImage"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AvatarImage = data
 		case "pocketMoney":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pocketMoney"))
-			data, err := ec.unmarshalOCharacterPocketMoneyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterPocketMoneyReq(ctx, v)
+			data, err := ec.unmarshalNCharacterPocketMoneyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterPocketMoneyReq(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.PocketMoney = data
 		case "proficiency":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiency"))
-			data, err := ec.unmarshalOCharacterProficiencyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReq(ctx, v)
+			data, err := ec.unmarshalNCharacterProficiencyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReq(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Proficiency = data
 		case "ability":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ability"))
-			data, err := ec.unmarshalOCharacterAbilityReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReq(ctx, v)
+			data, err := ec.unmarshalNCharacterAbilityReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReq(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Ability = data
 		case "classId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classId"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ClassID = data
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
 		}
 	}
 
@@ -11095,6 +11272,11 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._Character_ability(ctx, field, obj)
 		case "classId":
 			out.Values[i] = ec._Character_classId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userId":
+			out.Values[i] = ec._Character_userId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -11768,6 +11950,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_characterById(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "characterListByUserId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_characterListByUserId(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -12868,6 +13072,50 @@ func (ec *executionContext) marshalNCharacter2githubᚗcomᚋballinwzaᚋbeᚑpr
 	return ec._Character(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNCharacter2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Character) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCharacter2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacter(ctx context.Context, sel ast.SelectionSet, v *model.Character) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -12876,6 +13124,21 @@ func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋballinwzaᚋbe�
 		return graphql.Null
 	}
 	return ec._Character(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCharacterAbilityReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReq(ctx context.Context, v any) (*model.CharacterAbilityReq, error) {
+	res, err := ec.unmarshalInputCharacterAbilityReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCharacterPocketMoneyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterPocketMoneyReq(ctx context.Context, v any) (*model.CharacterPocketMoneyReq, error) {
+	res, err := ec.unmarshalInputCharacterPocketMoneyReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCharacterProficiencyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReq(ctx context.Context, v any) (*model.CharacterProficiencyReq, error) {
+	res, err := ec.unmarshalInputCharacterProficiencyReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNClass2ᚕᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Class) graphql.Marshaler {
@@ -13010,6 +13273,11 @@ func (ec *executionContext) marshalNHitPoint2ᚖgithubᚗcomᚋballinwzaᚋbeᚑ
 		return graphql.Null
 	}
 	return ec._HitPoint(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNHitPointReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐHitPointReq(ctx context.Context, v any) (*model.HitPointReq, error) {
+	res, err := ec.unmarshalInputHitPointReq(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
@@ -13633,14 +13901,6 @@ func (ec *executionContext) marshalOCharacterAbility2ᚖgithubᚗcomᚋballinwza
 	return ec._CharacterAbility(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOCharacterAbilityReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterAbilityReq(ctx context.Context, v any) (*model.CharacterAbilityReq, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputCharacterAbilityReq(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalOCharacterPocketMoney2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterPocketMoney(ctx context.Context, sel ast.SelectionSet, v *model.CharacterPocketMoney) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -13648,27 +13908,11 @@ func (ec *executionContext) marshalOCharacterPocketMoney2ᚖgithubᚗcomᚋballi
 	return ec._CharacterPocketMoney(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOCharacterPocketMoneyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterPocketMoneyReq(ctx context.Context, v any) (*model.CharacterPocketMoneyReq, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputCharacterPocketMoneyReq(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalOCharacterProficiency2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiency(ctx context.Context, sel ast.SelectionSet, v *model.CharacterProficiency) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CharacterProficiency(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOCharacterProficiencyReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐCharacterProficiencyReq(ctx context.Context, v any) (*model.CharacterProficiencyReq, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputCharacterProficiencyReq(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
@@ -13686,14 +13930,6 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	_ = sel
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
-}
-
-func (ec *executionContext) unmarshalOHitPointReq2ᚖgithubᚗcomᚋballinwzaᚋbeᚑpraditᚑdndᚑ2025ᚋinternalᚋgraphᚋmodelᚐHitPointReq(ctx context.Context, v any) (*model.HitPointReq, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputHitPointReq(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint32(ctx context.Context, v any) (*int32, error) {

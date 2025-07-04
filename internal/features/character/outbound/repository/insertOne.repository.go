@@ -8,21 +8,14 @@ import (
 )
 
 func (r CharacterRepository) InsertOne(ctx context.Context, characterEntity character_outbound_entity.CharacterEntity) (bool, error) {
-
-	factory := character_outbound_entity.CharacterEntity{
-		Name:        characterEntity.Name,
-		HitPoint:    characterEntity.HitPoint,
-		CurrentExp:  characterEntity.CurrentExp,
-		AvatarImage: characterEntity.AvatarImage,
-		PocketMoney: characterEntity.PocketMoney,
-		ClassId:     characterEntity.ClassId,
-		Ability:     characterEntity.Ability,
-		Proficiency: characterEntity.Proficiency,
+	if err := r.validate.Struct(characterEntity); err != nil {
+		log.Println("Error CharacterRepository.InsertOne validate: ", err)
+		return false, err
 	}
 
-	result, err := r.collection.InsertOne(ctx, factory)
+	result, err := r.collection.InsertOne(ctx, characterEntity)
 	if err != nil {
-		log.Println("Error CharacterRepository.InsertOne : ", err)
+		log.Println("Error CharacterRepository.InsertOne can't insert character : ", err)
 		return false, err
 	}
 

@@ -1,6 +1,8 @@
 package character_mapper
 
 import (
+	"log"
+
 	character_outbound_entity "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/outbound/entity"
 	"go.mongodb.org/mongo-driver/v2/bson"
 
@@ -22,6 +24,7 @@ func MapperCharacterEntityToModel(entity character_outbound_entity.CharacterEnti
 		Proficiency: (*model.CharacterProficiency)(&entity.Proficiency),
 		Ability:     (*model.CharacterAbility)(&entity.Ability),
 		ClassID:     entity.ClassId.Hex(),
+		UserID:      entity.UserId.Hex(),
 	}
 }
 
@@ -33,26 +36,25 @@ func MapperCharacterModelToEntity(req model.SaveCharacterReq) (*character_outbou
 
 	var objectId *bson.ObjectID
 	if req.ID != nil {
-		changedIdType, _ := bson.ObjectIDFromHex(*req.ID)
+		changedIdType, err := bson.ObjectIDFromHex(*req.ID)
 		objectId = &changedIdType
+		log.Printf("Error MapperCharacterModelToEntity invalid objecId : %v", err)
 	}
 
-	var classObjId *bson.ObjectID
-	if req.ClassID != nil {
-		objId, _ := bson.ObjectIDFromHex(*req.ClassID)
-		classObjId = &objId
-	}
+	classObjId, _ := bson.ObjectIDFromHex(req.ClassID)
+	userIdObjId, _ := bson.ObjectIDFromHex(req.UserID)
 
 	result := character_outbound_entity.CharacterEntity{
 		Id:          objectId,
 		Name:        req.Name,
 		HitPoint:    afterMappingHitPoint,
-		CurrentExp:  *req.CurrentExp,
-		AvatarImage: *req.AvatarImage,
+		CurrentExp:  req.CurrentExp,
+		AvatarImage: req.AvatarImage,
 		PocketMoney: *afterMappingPocketMoney,
 		Proficiency: *afterMapProficiency,
 		Ability:     *afterMapAbility,
-		ClassId:     *classObjId,
+		ClassId:     classObjId,
+		UserId:      userIdObjId,
 	}
 
 	return &result, nil

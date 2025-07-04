@@ -22,6 +22,16 @@ func (r *queryResolver) CharacterByID(ctx context.Context, id string) (*model.Ch
 	return result, nil
 }
 
+// CharacterListByUserID is the resolver for the characterListByUserId field.
+func (r *queryResolver) CharacterListByUserID(ctx context.Context, userID string) ([]*model.Character, error) {
+	result, err := r.CharacterService.GetCharacterListByUserId(ctx, userID)
+	if err != nil {
+		return nil, error_handler.NewValidationError("Failed to get CharacterByID", err, http.StatusInternalServerError).GqlError(ctx)
+	}
+
+	return result, nil
+}
+
 // WatchCharacterByID is the resolver for the watchCharacterById field.
 func (r *subscriptionResolver) WatchCharacterByID(ctx context.Context, id string) (<-chan *model.Character, error) {
 	result, err := r.CharacterService.WatchCharacterById(ctx, id)

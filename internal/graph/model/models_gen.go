@@ -42,6 +42,7 @@ type Character struct {
 	Proficiency *CharacterProficiency `json:"proficiency,omitempty"`
 	Ability     *CharacterAbility     `json:"ability,omitempty"`
 	ClassID     string                `json:"classId"`
+	UserID      string                `json:"userId"`
 }
 
 type CharacterAbility struct {
@@ -183,13 +184,14 @@ type Query struct {
 type SaveCharacterReq struct {
 	ID          *string                  `json:"id,omitempty"`
 	Name        string                   `json:"name"`
-	HitPoint    *HitPointReq             `json:"hitPoint,omitempty"`
-	CurrentExp  *int32                   `json:"currentExp,omitempty"`
-	AvatarImage *string                  `json:"avatarImage,omitempty"`
-	PocketMoney *CharacterPocketMoneyReq `json:"pocketMoney,omitempty"`
-	Proficiency *CharacterProficiencyReq `json:"proficiency,omitempty"`
-	Ability     *CharacterAbilityReq     `json:"ability,omitempty"`
-	ClassID     *string                  `json:"classId,omitempty"`
+	HitPoint    *HitPointReq             `json:"hitPoint"`
+	CurrentExp  int32                    `json:"currentExp"`
+	AvatarImage string                   `json:"avatarImage"`
+	PocketMoney *CharacterPocketMoneyReq `json:"pocketMoney"`
+	Proficiency *CharacterProficiencyReq `json:"proficiency"`
+	Ability     *CharacterAbilityReq     `json:"ability"`
+	ClassID     string                   `json:"classId"`
+	UserID      string                   `json:"userId"`
 }
 
 type Shield struct {

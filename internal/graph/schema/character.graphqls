@@ -45,6 +45,7 @@ type Character {
   proficiency: CharacterProficiency
   ability: CharacterAbility
   classId: String!
+  userId: String!
 }
 
 type CharacterPocketMoney {
@@ -61,4 +62,5 @@ extend type Subscription {
 
 extend type Query {
   characterById(id: String!): Character!
+  characterListByUserId(userId: String!): [Character!]!
 }

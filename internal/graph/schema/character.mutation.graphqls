@@ -46,13 +46,14 @@ input CharacterPocketMoneyReq {
 input SaveCharacterReq {
   id: String
   name: String!
-  hitPoint: HitPointReq
-  currentExp: Int
-  avatarImage: String
-  pocketMoney: CharacterPocketMoneyReq
-  proficiency: CharacterProficiencyReq
-  ability: CharacterAbilityReq
-  classId: String
+  hitPoint: HitPointReq!
+  currentExp: Int!
+  avatarImage: String!
+  pocketMoney: CharacterPocketMoneyReq!
+  proficiency: CharacterProficiencyReq!
+  ability: CharacterAbilityReq!
+  classId: String!
+  userId: String!
 }
 
 extend type Mutation {
