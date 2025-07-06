@@ -7,6 +7,7 @@ toolchain go1.23.9
 require (
 	github.com/99designs/gqlgen v0.17.73
 	github.com/go-playground/validator/v10 v10.27.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/gorilla/websocket v1.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/cors v1.11.1
