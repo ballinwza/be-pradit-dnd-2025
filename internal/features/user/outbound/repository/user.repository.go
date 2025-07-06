@@ -1,4 +1,4 @@
-package user_repository
+package user_outbound_repository
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-type UserRepository struct{
+type UserRepository struct {
 	collection *mongo.Collection
 }
 
@@ -27,9 +27,9 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]user_entity.UserEntity,
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			log.Println("UserRepository.FindAll Error : Not founded document") 
+			log.Println("UserRepository.FindAll Error : Not founded document")
 			return nil, mongo.ErrNoDocuments
-		} 
+		}
 
 		log.Println("UserRepository.FindAll Error : ", err)
 		return nil, err
@@ -49,10 +49,10 @@ func (r *UserRepository) FindOneById(ctx context.Context, objId bson.ObjectID) (
 	err := r.collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			log.Println("UserRepository.FindOneById Error : Not founded document") 
+			log.Println("UserRepository.FindOneById Error : Not founded document")
 			return nil, err
-		} 
-		
+		}
+
 		log.Println("UserRepository.FindOneById Error : ", err)
 		return nil, err
 	}
