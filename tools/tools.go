@@ -5,6 +5,7 @@ package tools
 import (
 	_ "github.com/99designs/gqlgen"
 	_ "github.com/go-playground/validator/v10"
+	_ "github.com/golang-jwt/jwt/v5"
 	_ "github.com/gorilla/websocket"
 	_ "github.com/joho/godotenv"
 	_ "github.com/rs/cors"

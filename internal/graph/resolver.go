@@ -1,6 +1,12 @@
 package graph
 
 import (
+	"context"
+	"errors"
+	"net/http"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/ballinwza/be-pradit-dnd-2025/internal/error_handler"
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
 	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
@@ -9,6 +15,7 @@ import (
 	level_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/level/service"
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	weapon_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/weapon/service"
+	"github.com/ballinwza/be-pradit-dnd-2025/middleware"
 )
 
 // This file will not be regenerated automatically.
@@ -24,4 +31,14 @@ type Resolver struct {
 	EquipmentService     *equipment_service.EquipmentService
 	ClassService         *class_service.ClassService
 	LevelService         *level_service.LevelService
+}
+
+func Auth(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+	claims, ok := ctx.Value(middleware.UserCtxKey).(*middleware.UserClaims)
+
+	if !ok || claims == nil {
+		return nil, error_handler.NewValidationError("access denied: you must be logged in", errors.New("invalid token"), http.StatusInternalServerError).GqlError(ctx)
+	}
+
+	return next(ctx)
 }

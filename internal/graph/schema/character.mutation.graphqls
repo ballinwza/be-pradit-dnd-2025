@@ -57,5 +57,5 @@ input SaveCharacterReq {
 }
 
 extend type Mutation {
-  saveCharacter(data: SaveCharacterReq!): Boolean!
+  saveCharacter(data: SaveCharacterReq!): Boolean! @auth
 }
