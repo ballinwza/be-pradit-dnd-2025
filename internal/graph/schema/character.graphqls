@@ -57,10 +57,10 @@ type CharacterPocketMoney {
 }
 
 extend type Subscription {
-  watchCharacterById(id: String!): Character!
+  watchCharacterById(id: String!): Character! @auth
 }
 
 extend type Query {
-  characterById(id: String!): Character!
-  characterListByUserId(userId: String!): [Character!]!
+  characterById(id: String!): Character! @auth
+  characterListByUserId(userId: String!): [Character!]! @auth
 }

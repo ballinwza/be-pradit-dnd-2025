@@ -24,29 +24,29 @@ import (
 	user_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/user/service"
 	weapon_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/weapon/service"
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/graph"
+	"github.com/ballinwza/be-pradit-dnd-2025/middleware"
 )
 
 func InjecterAllService() *handler.Server {
-	userService := user_service.NewUserService()
-	characterService := character_service.NewCharacterService()
-	abilityDetailService := ability_detail_service.NewAbilityDetailService()
-	armorService := armor_service.NewArmorService()
-	weaponService := weapon_service.NewWeaponService()
-	equipmentService := equipment_service.NewEquipmentService()
-	classService := class_service.NewClassService()
-	levelService := level_service.NewLevelService()
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		UserService:          userService,
-		CharacterService:     characterService,
-		AbilityDetailService: abilityDetailService,
-		ArmorService:         armorService,
-		WeaponService:        weaponService,
-		EquipmentService:     equipmentService,
-		ClassService:         classService,
-		LevelService:         levelService,
-	}}))
+	// Inject dependencies
+	graphConfig := graph.Config{Resolvers: &graph.Resolver{
+		UserService:          user_service.NewUserService(),
+		CharacterService:     character_service.NewCharacterService(),
+		AbilityDetailService: ability_detail_service.NewAbilityDetailService(),
+		ArmorService:         armor_service.NewArmorService(),
+		WeaponService:        weapon_service.NewWeaponService(),
+		EquipmentService:     equipment_service.NewEquipmentService(),
+		ClassService:         class_service.NewClassService(),
+		LevelService:         level_service.NewLevelService(),
+	}}
 
+	// Authentication
+	graphConfig.Directives.Auth = graph.Auth
+
+	srv := handler.New(graph.NewExecutableSchema(graphConfig))
+
+	// Websocket
 	srv.AddTransport(&transport.Websocket{
 		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
@@ -57,18 +57,33 @@ func InjecterAllService() *handler.Server {
 			WriteBufferSize: 1024,
 		},
 		KeepAlivePingInterval: 10 * time.Second,
+		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
+			// initPayload คือ connectionParams ที่เราส่งมาจาก Client
+			authHeader, ok := initPayload["Authorization"].(string)
+			if !ok {
+				// ไม่มี Authorization ส่งมา
+				return ctx, nil, nil // ปล่อยผ่านไปก่อน ให้ resolver จัดการ
+			}
+
+			// ตรวจสอบ JWT (อาจจะดึง logic มาจาก http middleware)
+			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+			claims, err := middleware.VerifyToken(tokenString) // สร้างฟังก์ชัน verifyToken ขึ้นมาใช้ซ้ำ
+			if err != nil {
+				// Token ไม่ถูกต้อง, ไม่ต้องทำอะไร ปล่อย context ว่าง
+				return ctx, nil, nil
+			}
+
+			// ถ้า Token ถูกต้อง, แนบ claims ไปกับ context ของ connection นี้
+			return context.WithValue(ctx, middleware.UserCtxKey, claims), nil, nil
+		},
 	})
+
+	// Http
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
 
-	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
-
-	srv.Use(extension.Introspection{})
-	srv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New[string](100),
-	})
-
+	// Execution handler
 	srv.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
 		gqlErr := graphql.DefaultErrorPresenter(ctx, err)
 		if gqlErr.Extensions == nil {
@@ -83,6 +98,13 @@ func InjecterAllService() *handler.Server {
 		}
 
 		return gqlErr
+	})
+
+	// Other
+	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
+	srv.Use(extension.Introspection{})
+	srv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New[string](100),
 	})
 
 	return srv
