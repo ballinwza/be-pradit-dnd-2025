@@ -39,20 +39,24 @@ func (r *ArmorRepository) FindOneById(ctx context.Context, objId bson.ObjectID) 
 }
 
 func (r *ArmorRepository) FindAll(ctx context.Context, equipmentType armor_outbound_entity.ArmorEquipmentTypeArmorEntity) ([]*armor_outbound_entity.ArmorEntity, error) {
-	cursor, err := r.collection.Find(ctx, bson.M{"armor_equipment_type": equipmentType})
+	filter := armor_outbound_entity.ArmorEntityFilter{
+		ArmorEquipmentType: &equipmentType,
+	}
+
+	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			log.Println("ArmorRepository.FindAll Error : Not founded document")
+			log.Println("Error ArmorRepository.FindAll : Not founded document")
 			return nil, mongo.ErrNoDocuments
 		}
 
-		log.Println("ArmorRepository.FindAll Error : ", err)
+		log.Println("Error ArmorRepository.FindAll : ", err)
 		return nil, err
 	}
 
 	var result []*armor_outbound_entity.ArmorEntity
 	if err := cursor.All(ctx, &result); err != nil {
-		log.Println("ArmorRepository.FindAll Error : ", err)
+		log.Println("Error ArmorRepository.FindAll can't decode : ", err)
 		return nil, err
 	}
 

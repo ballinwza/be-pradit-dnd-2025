@@ -177,6 +177,7 @@ type ComplexityRoot struct {
 		CharacterByID          func(childComplexity int, id string) int
 		CharacterListByUserID  func(childComplexity int, userID string) int
 		ClassList              func(childComplexity int) int
+		ClearCache             func(childComplexity int) int
 		EquipmentByCharacterID func(childComplexity int, characterID string) int
 		LevelList              func(childComplexity int) int
 		ShieldList             func(childComplexity int) int
@@ -265,6 +266,7 @@ type QueryResolver interface {
 	ArmorByID(ctx context.Context, id string) (*model.Armor, error)
 	ArmorList(ctx context.Context) ([]*model.Armor, error)
 	ShieldList(ctx context.Context) ([]*model.Armor, error)
+	ClearCache(ctx context.Context) (bool, error)
 	CharacterByID(ctx context.Context, id string) (*model.Character, error)
 	CharacterListByUserID(ctx context.Context, userID string) ([]*model.Character, error)
 	ClassList(ctx context.Context) ([]*model.Class, error)
@@ -931,6 +933,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.ClassList(childComplexity), true
 
+	case "Query.clearCache":
+		if e.complexity.Query.ClearCache == nil {
+			break
+		}
+
+		return e.complexity.Query.ClearCache(childComplexity), true
+
 	case "Query.equipmentByCharacterId":
 		if e.complexity.Query.EquipmentByCharacterID == nil {
 			break
@@ -1444,7 +1453,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/auth.graphqls" "schema/character.graphqls" "schema/character.mutation.graphqls" "schema/class.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/level.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
+//go:embed "schema/ability_detail.graphqls" "schema/advantage.graphqls" "schema/armor.graphqls" "schema/auth.graphqls" "schema/cache.graphqls" "schema/character.graphqls" "schema/character.mutation.graphqls" "schema/class.graphqls" "schema/coin.graphqls" "schema/damaged.graphqls" "schema/dice.graphqls" "schema/equipment.graphqls" "schema/level.graphqls" "schema/proficiency_detail.graphqls" "schema/user.graphqls" "schema/weapon.graphqls" "schema/weight.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1460,6 +1469,7 @@ var sources = []*ast.Source{
 	{Name: "schema/advantage.graphqls", Input: sourceData("schema/advantage.graphqls"), BuiltIn: false},
 	{Name: "schema/armor.graphqls", Input: sourceData("schema/armor.graphqls"), BuiltIn: false},
 	{Name: "schema/auth.graphqls", Input: sourceData("schema/auth.graphqls"), BuiltIn: false},
+	{Name: "schema/cache.graphqls", Input: sourceData("schema/cache.graphqls"), BuiltIn: false},
 	{Name: "schema/character.graphqls", Input: sourceData("schema/character.graphqls"), BuiltIn: false},
 	{Name: "schema/character.mutation.graphqls", Input: sourceData("schema/character.mutation.graphqls"), BuiltIn: false},
 	{Name: "schema/class.graphqls", Input: sourceData("schema/class.graphqls"), BuiltIn: false},
@@ -5802,6 +5812,50 @@ func (ec *executionContext) fieldContext_Query_shieldList(_ context.Context, fie
 				return ec.fieldContext_Armor_imageUrl(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_clearCache(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_clearCache(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ClearCache(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_clearCache(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11947,6 +12001,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_shieldList(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "clearCache":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_clearCache(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

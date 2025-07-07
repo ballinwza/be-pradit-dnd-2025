@@ -9,6 +9,7 @@ import (
 	"github.com/ballinwza/be-pradit-dnd-2025/internal/error_handler"
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
 	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
+	cache_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/cache/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
 	class_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/class/service"
 	equipment_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/service"
@@ -31,6 +32,7 @@ type Resolver struct {
 	EquipmentService     *equipment_service.EquipmentService
 	ClassService         *class_service.ClassService
 	LevelService         *level_service.LevelService
+	CacheService         *cache_service.CacheService
 }
 
 func Auth(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
