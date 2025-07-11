@@ -49,3 +49,15 @@ type ShieldEntity struct {
 	ArmorEquipmentType    ArmorEquipmentTypeArmorEntity            `bson:"armor_equipment_type" json:"armor_equipment_type"`
 	ImageUrl              *string
 }
+
+type ArmorEntityFilter struct {
+	Id                    *bson.ObjectID                            `bson:"_id,omitempty"`
+	ArmorType             *ArmorTypeEntity                          `bson:"armor_type,omitempty"`
+	Name                  *string                                   `bson:"name,omitempty"`
+	ArmorClass            *int32                                    `bson:"armor_class,omitempty"`
+	MaximumPlusArmorClass *int32                                    `bson:"maximum_plus_ac,omitempty"`
+	StealthAdvantage      *core_outbound_entity.AdvantageTypeEntity `bson:"stealth_advantage,omitempty"`
+	Price                 *core_outbound_entity.CoinEntity          `bson:"price,omitempty"`
+	StrRequirement        *int32                                    `bson:"str_requirement,omitempty"`
+	ArmorEquipmentType    *ArmorEquipmentTypeArmorEntity            `bson:"armor_equipment_type,omitempty"`
+}

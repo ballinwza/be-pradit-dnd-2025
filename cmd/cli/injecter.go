@@ -17,6 +17,7 @@ import (
 
 	ability_detail_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/ability_detail/service"
 	armor_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/armor/service"
+	cache_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/cache/service"
 	character_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/character/service"
 	class_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/class/service"
 	equipment_service "github.com/ballinwza/be-pradit-dnd-2025/internal/features/equipment/service"
@@ -29,16 +30,19 @@ import (
 
 func InjecterAllService() *handler.Server {
 
+	inMemoryCache := cache_service.NewInMemoryCache(15*time.Minute, 16*time.Minute)
+
 	// Inject dependencies
 	graphConfig := graph.Config{Resolvers: &graph.Resolver{
 		UserService:          user_service.NewUserService(),
 		CharacterService:     character_service.NewCharacterService(),
 		AbilityDetailService: ability_detail_service.NewAbilityDetailService(),
-		ArmorService:         armor_service.NewArmorService(),
+		ArmorService:         armor_service.NewArmorService(inMemoryCache),
 		WeaponService:        weapon_service.NewWeaponService(),
 		EquipmentService:     equipment_service.NewEquipmentService(),
 		ClassService:         class_service.NewClassService(),
 		LevelService:         level_service.NewLevelService(),
+		CacheService:         cache_service.NewCacheService(inMemoryCache),
 	}}
 
 	// Authentication
