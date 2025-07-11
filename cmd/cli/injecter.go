@@ -30,7 +30,7 @@ import (
 
 func InjecterAllService() *handler.Server {
 
-	inMemoryCache := cache_service.NewInMemoryCache(20*time.Second, 30*time.Second)
+	inMemoryCache := cache_service.NewInMemoryCache(15*time.Minute, 16*time.Minute)
 
 	// Inject dependencies
 	graphConfig := graph.Config{Resolvers: &graph.Resolver{
